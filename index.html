@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>FältPunkter — Positioner</title>
+<meta name="description" content="Verktyg för geografiska punkter, avstånd och listor">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000;--surface:rgba(10,12,18,.96);--surface2:rgba(20,24,36,.95);
+  --border:rgba(255,255,255,.08);--border-light:rgba(255,255,255,.04);
+  --text:#b8bfcc;--text-bright:#f0f2f6;--text-dim:#4a5268;
+  --accent:#3b82f6;--accent-glow:rgba(59,130,246,.15);
+  --cyan:#2ee8c8;--cyan-glow:rgba(46,232,200,.12);
+  --green:#10b981;--orange:#f59e0b;--red:#ef4444;--purple:#a855f7;
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;
+}
+html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;font-family:var(--sans);color:var(--text);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+
+.map-wrap{flex:1;position:relative;min-height:0}
+#map{width:100%;height:100%;z-index:1}
+.leaflet-control-zoom{display:none!important}
+
+.layers{position:absolute;top:10px;right:10px;z-index:1000;display:flex;gap:3px}
+.layer-pill{padding:10px 16px;border:none;border-radius:20px;background:var(--surface);color:var(--text-dim);font-family:var(--sans);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.06em;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5)}
+.layer-pill.active{background:var(--accent);color:#fff;box-shadow:0 2px 16px rgba(59,130,246,.4)}
+
+.crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:800;pointer-events:none;width:60px;height:60px}
+.ch-ring{position:absolute;inset:8px;border:1.5px solid rgba(255,255,255,.25);border-radius:50%}
+.ch-v{position:absolute;width:1px;height:100%;left:50%;background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.4) 30%,rgba(255,255,255,0) 45%,rgba(255,255,255,0) 55%,rgba(255,255,255,.4) 70%,rgba(255,255,255,0))}
+.ch-h{position:absolute;height:1px;width:100%;top:50%;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.4) 30%,rgba(255,255,255,0) 45%,rgba(255,255,255,0) 55%,rgba(255,255,255,.4) 70%,rgba(255,255,255,0))}
+.ch-dot{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--cyan);left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 6px var(--cyan)}
+
+.gps-badge{position:absolute;top:10px;left:10px;z-index:1000;display:flex;align-items:center;gap:10px;padding:10px 18px;background:var(--surface);border-radius:24px;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5);cursor:pointer;transition:all .2s;border:1px solid transparent}
+.gps-badge.tracking{border-color:var(--cyan)}
+.gps-text{font-size:.8rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em}
+.gps-badge.tracking .gps-text{color:var(--cyan)}
+.gps-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.gps-dot.off{background:var(--text-dim)}
+.gps-dot.good{background:var(--green);box-shadow:0 0 6px var(--green)}
+.gps-dot.ok{background:var(--orange);box-shadow:0 0 6px var(--orange)}
+.gps-dot.poor{background:var(--red);box-shadow:0 0 6px var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.gps-badge.searching .gps-dot{animation:pulse 1.2s infinite}
+
+.center-btn{position:absolute;bottom:50%;right:10px;z-index:1000;width:48px;height:48px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.3rem;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5);transition:all .2s}
+.center-btn:active{transform:scale(.92);background:var(--accent);color:#fff}
+
+.zoom-btns{position:absolute;right:10px;z-index:1000;display:flex;flex-direction:column;gap:2px;bottom:calc(50% - 60px)}
+.zoom-btn{width:44px;height:44px;border-radius:12px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:1.3rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(16px);transition:all .15s}
+.zoom-btn:active{background:var(--surface2);transform:scale(.92)}
+
+/* COORDINATE PANEL */
+.coord-panel{
+  position:absolute;bottom:0;left:0;right:0;z-index:1000;
+  background:linear-gradient(0deg,rgba(0,0,0,1) 30%,rgba(6,8,14,.92));
+  padding:16px 16px max(16px, env(safe-area-inset-bottom));
+  backdrop-filter:blur(24px);
+  border-top:1px solid var(--border);
+}
+
+.coord-source{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.source-pill{padding:8px 12px;border-radius:14px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-family:var(--sans);font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.05em}
+.source-pill.active{background:var(--cyan-glow);color:var(--cyan);border-color:rgba(46,232,200,.3)}
+.source-spacer{flex:1}
+.acc-tag{font-size:.7rem;font-weight:700;color:var(--text-dim);padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.04)}
+.acc-tag .val{font-family:var(--mono)}
+.acc-tag.good .val{color:var(--green)}
+.acc-tag.ok .val{color:var(--orange)}
+.acc-tag.poor .val{color:var(--red)}
+
+.coords-block{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;gap:12px}
+.coords-left{flex:1;display:flex;flex-direction:column;gap:6px}
+.coord-row{display:flex;align-items:center;gap:8px}
+.c-label{font-size:.7rem;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;width:18px}
+.c-digits{font-family:var(--mono);font-size:2rem;font-weight:700;color:var(--text-bright);letter-spacing:.02em;line-height:1}
+.c-digits .int{color:var(--text-bright)}
+.c-digits .dot{color:var(--text-dim)}
+.c-digits .dec{color:var(--cyan)}
+.c-digits.warn .dec{color:var(--orange);opacity:.7}
+.c-digits.warn .int{opacity:.8}
+
+.save-btn{height:56px;padding:0 24px;border-radius:16px;border:none;background:var(--green);color:#fff;font-family:var(--sans);font-size:1rem;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(16,185,129,.3)}
+.save-btn:active{transform:scale(.95)}
+
+.list-btn{width:100%;height:52px;border-radius:16px;border:1px solid var(--border);background:var(--surface2);color:var(--text-bright);font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.list-btn:hover{background:rgba(255,255,255,.04)}
+.list-btn:active{transform:scale(.98)}
+.list-count{background:var(--accent);color:#fff;padding:2px 8px;border-radius:10px;font-size:.8rem;font-weight:800}
+
+/* LIST DRAWER */
+.drawer{position:absolute;bottom:0;left:0;right:0;height:85vh;background:#000;z-index:2000;border-radius:24px 24px 0 0;border-top:1px solid rgba(255,255,255,.12);transform:translateY(100%);transition:transform .3s cubic-bezier(.17,.84,.44,1);display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.8)}
+.drawer.open{transform:translateY(0)}
+.dr-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.dr-title{font-size:1.1rem;font-weight:800;color:#fff}
+.dr-close{background:var(--surface2);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.dr-sort{display:flex;gap:6px;padding:12px 20px;background:var(--surface)}
+.sort-btn{flex:1;padding:8px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--sans);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s}
+.sort-btn.active{background:var(--accent-glow);color:var(--accent);border-color:var(--accent)}
+
+.dr-list{flex:1;overflow-y:auto;padding:12px;background:#000;display:flex;flex-direction:column;gap:12px}
+.pt-card{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:all .2s}
+.pt-card:active{transform:scale(.98)}
+.pt-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pt-name{font-size:1.1rem;font-weight:800;color:var(--text-bright);word-break:break-word}
+.pt-dist{background:var(--cyan-glow);color:var(--cyan);font-family:var(--mono);font-size:.85rem;font-weight:700;padding:4px 10px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.pt-info{display:flex;align-items:center;justify-content:space-between;margin-top:2px}
+.pt-coords{font-family:var(--mono);font-size:.8rem;color:var(--text-dim)}
+.pt-tag{font-size:.7rem;font-weight:700;color:var(--purple);background:rgba(168,85,247,.1);padding:4px 10px;border-radius:8px;text-transform:uppercase;letter-spacing:.05em}
+
+.pt-actions{display:flex;gap:8px;margin-top:4px}
+.pt-btn{flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--sans);font-size:.8rem;font-weight:700;cursor:pointer}
+.pt-btn.nav{color:var(--accent);border-color:rgba(59,130,246,.3)}
+.pt-btn.del{color:var(--red);border-color:rgba(239,68,68,.3)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)}
+.modal-overlay.visible{display:flex;animation:fade .2s}
+.modal{background:var(--surface);border-top:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:500px;animation:slideUp .25s ease;box-shadow:0 -10px 40px rgba(0,0,0,.8)}
+.modal.center{border-radius:24px;align-self:center;margin:20px;border:1px solid var(--border)}
+.modal h3{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.75rem;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.form-group input{width:100%;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:#000;color:#fff;font-family:var(--sans);font-size:1rem;outline:none}
+.form-group input:focus{border-color:var(--accent)}
+.modal-actions{display:flex;gap:10px;margin-top:24px}
+.modal-actions button{flex:1;padding:16px;border-radius:16px;font-family:var(--sans);font-size:1rem;font-weight:800;cursor:pointer;border:none}
+.btn-cancel{background:var(--surface2);color:var(--text);border:1px solid var(--border)!important}
+.btn-save{background:var(--green);color:#fff}
+
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.toast{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:4000;background:var(--surface);color:#fff;padding:16px 28px;border-radius:18px;font-family:var(--sans);font-size:1.1rem;font-weight:800;opacity:0;transition:all .2s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.8);border:1px solid var(--border);backdrop-filter:blur(24px)}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* Empty state */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-dim);font-weight:600}
+.empty-state span{font-size:3rem;display:block;margin-bottom:12px;opacity:.5}
+</style>
+</head>
+<body>
+
+<div class="map-wrap">
+  <div id="map"></div>
+  <div class="crosshair"><div class="ch-ring"></div><div class="ch-v"></div><div class="ch-h"></div><div class="ch-dot"></div></div>
+  <div class="gps-badge" id="gpsBadge" onclick="toggleGPS()"><div class="gps-dot off" id="gpsDot"></div><span class="gps-text" id="gpsText">GPS av</span></div>
+  <div class="layers">
+    <button class="layer-pill active" data-layer="street">Karta</button>
+    <button class="layer-pill" data-layer="terrain">Terr</button>
+    <button class="layer-pill" data-layer="satellite">Sat</button>
+  </div>
+  <button class="center-btn" onclick="centerOnGPS()" title="Centrera">🎯</button>
+  <div class="zoom-btns">
+    <button class="zoom-btn" onclick="map.zoomIn()">+</button>
+    <button class="zoom-btn" onclick="map.zoomOut()">−</button>
+  </div>
+
+  <div class="coord-panel">
+    <div class="coord-source">
+      <button class="source-pill active" data-mode="center" onclick="setSource('center')">⊕ Karta</button>
+      <button class="source-pill" data-mode="gps" onclick="setSource('gps')">📡 GPS</button>
+      <button class="source-pill" data-mode="tap" onclick="setSource('tap')">👆 Tryck</button>
+      <div class="source-spacer"></div>
+      <div class="acc-tag" id="accTag" style="display:none">±<span class="val" id="accVal">?</span>m</div>
+    </div>
+    
+    <div class="coords-block">
+      <div class="coords-left">
+        <div class="coord-row"><span class="c-label">N</span><span class="c-digits" id="latDigits"><span class="int">56</span><span class="dot">.</span><span class="dec">13090</span></span></div>
+        <div class="coord-row"><span class="c-label">E</span><span class="c-digits" id="lngDigits"><span class="int">12</span><span class="dot">.</span><span class="dec">99170</span></span></div>
+      </div>
+      <button class="save-btn" onclick="openSaveModal()">
+        <span>Spara</span>
+        <span style="font-size:1.2rem">📌</span>
+      </button>
+    </div>
+
+    <button class="list-btn" onclick="openDrawer()">
+      <span>Visa positioner</span>
+      <span class="list-count" id="btnCount">0</span>
+    </button>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer" id="listDrawer">
+  <div class="dr-header">
+    <div class="dr-title">Sparade positioner (<span id="drCount">0</span>)</div>
+    <button class="dr-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="dr-sort">
+    <button class="sort-btn active" id="sortTime" onclick="setSort('time')">Senaste först</button>
+    <button class="sort-btn" id="sortDist" onclick="setSort('dist')">Närmast först</button>
+  </div>
+  <div class="dr-list" id="pointList">
+    <!-- Items go here -->
+  </div>
+  <div style="padding:16px; border-top:1px solid var(--border)">
+    <button class="list-btn" onclick="exportTSV()" style="color:var(--accent);border-color:var(--border)">📥 Exportera data (TSV)</button>
+  </div>
+</div>
+
+<!-- SAVE MODAL -->
+<div class="modal-overlay" id="saveModalOverlay">
+  <div class="modal center">
+    <h3>Spara Position</h3>
+    <div class="form-group">
+      <label>Namn på plats / beskrivning</label>
+      <input type="text" id="ptName" placeholder="T.ex. Klippan, Träd A...">
+    </div>
+    <div class="form-group">
+      <label>Valfri Tagg (kategori)</label>
+      <input type="text" id="ptTag" placeholder="T.ex. Inventering 2026">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeSaveModal()">Avbryt</button>
+      <button class="btn-save" onclick="savePoint()">Spara punkt</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// CONSTANTS
+const ASTORP = [[56.079018, 13.059436], [56.081496, 13.054843], [56.083058, 13.051493], [56.085939, 13.046324], [56.089626, 13.04104], [56.092278, 13.038591], [56.093591, 13.037539], [56.095043, 13.033292], [56.099759, 13.024756], [56.102916, 13.014254], [56.106944, 13.011282], [56.11316, 13.004482], [56.108654, 12.990059], [56.110146, 12.989087], [56.110924, 12.988185], [56.111453, 12.987216], [56.112414, 12.982626], [56.112373, 12.981379], [56.113025, 12.981273], [56.113139, 12.979722], [56.113761, 12.977331], [56.114323, 12.968654], [56.115507, 12.966735], [56.11593, 12.965447], [56.116042, 12.965401], [56.116109, 12.963941], [56.116427, 12.963824], [56.11671, 12.963302], [56.11685, 12.963286], [56.118109, 12.960485], [56.118361, 12.959631], [56.118175, 12.958802], [56.117821, 12.958246], [56.118214, 12.957502], [56.11916, 12.957108], [56.120627, 12.955331], [56.120492, 12.954274], [56.120117, 12.954232], [56.120244, 12.953206], [56.120122, 12.953047], [56.120169, 12.950736], [56.122045, 12.949454], [56.11859, 12.916728], [56.116596, 12.917484], [56.115898, 12.921116], [56.115651, 12.925296], [56.114396, 12.925618], [56.114425, 12.924524], [56.112947, 12.924484], [56.113167, 12.92252], [56.112273, 12.919341], [56.113227, 12.917678], [56.113273, 12.917084], [56.113124, 12.916611], [56.113017, 12.913949], [56.113459, 12.909935], [56.103297, 12.900061], [56.103881, 12.897255], [56.10445, 12.896619], [56.104162, 12.896031], [56.104243, 12.895738], [56.104479, 12.895669], [56.104542, 12.895471], [56.104812, 12.892667], [56.105103, 12.891976], [56.105792, 12.89129], [56.104735, 12.888546], [56.105399, 12.887325], [56.105745, 12.886351], [56.106257, 12.885944], [56.106861, 12.884855], [56.107011, 12.883734], [56.105899, 12.882239], [56.1054, 12.882307], [56.104306, 12.881977], [56.103392, 12.881848], [56.102883, 12.881462], [56.1001, 12.880028], [56.096164, 12.87641], [56.094395, 12.875114], [56.094205, 12.874001], [56.087242, 12.876645], [56.090692, 12.870364], [56.093047, 12.865675], [56.097449, 12.855472], [56.099432, 12.851257], [56.100388, 12.848455], [56.100891, 12.845936], [56.101046, 12.845955], [56.100961, 12.845706], [56.101033, 12.842916], [56.101785, 12.843332], [56.102683, 12.841814], [56.103921, 12.842151], [56.10458, 12.84099], [56.105209, 12.840829], [56.105907, 12.84547], [56.106277, 12.845481], [56.106486, 12.846767], [56.10673, 12.846855], [56.107698, 12.84665], [56.109205, 12.845461], [56.109646, 12.846147], [56.110459, 12.847016], [56.111374, 12.84764], [56.111509, 12.847266], [56.111883, 12.848639], [56.112746, 12.849083], [56.112946, 12.848656], [56.113364, 12.848272], [56.114378, 12.848074], [56.114616, 12.84743], [56.114852, 12.847201], [56.115274, 12.847413], [56.115423, 12.84734], [56.115825, 12.846718], [56.116893, 12.84551], [56.117964, 12.844922], [56.118032, 12.84392], [56.118232, 12.843232], [56.118676, 12.844016], [56.120679, 12.845574], [56.121822, 12.840406], [56.124608, 12.83673], [56.12621, 12.838174], [56.128553, 12.838898], [56.128175, 12.842392], [56.128447, 12.842272], [56.128231, 12.843722], [56.12824, 12.845519], [56.128897, 12.848048], [56.129344, 12.847559], [56.129942, 12.847359], [56.130442, 12.846796], [56.130758, 12.845986], [56.131467, 12.84594], [56.131857, 12.845778], [56.132379, 12.846463], [56.13301, 12.846876], [56.13317, 12.847407], [56.133043, 12.847952], [56.133327, 12.848043], [56.133251, 12.849057], [56.133004, 12.848921], [56.133103, 12.849843], [56.133207, 12.849846], [56.132843, 12.855008], [56.132965, 12.85523], [56.133125, 12.853097], [56.133632, 12.852775], [56.133856, 12.852825], [56.13536, 12.85441], [56.135007, 12.856188], [56.13471, 12.857216], [56.134439, 12.857707], [56.134547, 12.858743], [56.134173, 12.859286], [56.134276, 12.85998], [56.133962, 12.861018], [56.133889, 12.861144], [56.133786, 12.861112], [56.133498, 12.860802], [56.133012, 12.861664], [56.132528, 12.861601], [56.1324, 12.861718], [56.132446, 12.862315], [56.132849, 12.863543], [56.133247, 12.865729], [56.133367, 12.866027], [56.133674, 12.866165], [56.133759, 12.866661], [56.133306, 12.867482], [56.133586, 12.86814], [56.133405, 12.869554], [56.133037, 12.871074], [56.133075, 12.872193], [56.133353, 12.872548], [56.133334, 12.873133], [56.137534, 12.872941], [56.137933, 12.875136], [56.137746, 12.875276], [56.137886, 12.875978], [56.138069, 12.875885], [56.139264, 12.882464], [56.142084, 12.882352], [56.14265, 12.896625], [56.140547, 12.89594], [56.138161, 12.895721], [56.136467, 12.896038], [56.137018, 12.898474], [56.137235, 12.900777], [56.137227, 12.903066], [56.137401, 12.903696], [56.138255, 12.905057], [56.138612, 12.905962], [56.138681, 12.906307], [56.13855, 12.906969], [56.138888, 12.907668], [56.138718, 12.909158], [56.138822, 12.910173], [56.138464, 12.911526], [56.138198, 12.913465], [56.138184, 12.914225], [56.138523, 12.915887], [56.138652, 12.917423], [56.139036, 12.918661], [56.139574, 12.919882], [56.139993, 12.9198], [56.140664, 12.920538], [56.140938, 12.920542], [56.141112, 12.920885], [56.14094, 12.921799], [56.140319, 12.923171], [56.140279, 12.923482], [56.140304, 12.924789], [56.141115, 12.927689], [56.14071, 12.931042], [56.140764, 12.932108], [56.142664, 12.934394], [56.144679, 12.938544], [56.144525, 12.940732], [56.146715, 12.94175], [56.14662, 12.941999], [56.148976, 12.942053], [56.148985, 12.948553], [56.152052, 12.948388], [56.153815, 12.949786], [56.154369, 12.949981], [56.158698, 12.949896], [56.160156, 12.94874], [56.164876, 12.95585], [56.164997, 12.955913], [56.165246, 12.955129], [56.168405, 12.954653], [56.170632, 12.954912], [56.172273, 12.955612], [56.17386, 12.962805], [56.174269, 12.962669], [56.174888, 12.962015], [56.175159, 12.961891], [56.175336, 12.962063], [56.176036, 12.962074], [56.176724, 12.962692], [56.177449, 12.96269], [56.177703, 12.962411], [56.1779, 12.962462], [56.178176, 12.962304], [56.178342, 12.962584], [56.178453, 12.962805], [56.178634, 12.981712], [56.179735, 12.99329], [56.187364, 13.012548], [56.186297, 13.014859], [56.186125, 13.01576], [56.186195, 13.016804], [56.185812, 13.0176], [56.185534, 13.017762], [56.184769, 13.017871], [56.183427, 13.017622], [56.182649, 13.017709], [56.181314, 13.017602], [56.18092, 13.017847], [56.179467, 13.01966], [56.17814, 13.022322], [56.177417, 13.024092], [56.176306, 13.025187], [56.175703, 13.026048], [56.175173, 13.02722], [56.174627, 13.028901], [56.172274, 13.032405], [56.171855, 13.032872], [56.17118, 13.033047], [56.170079, 13.032819], [56.169142, 13.032984], [56.168094, 13.032836], [56.167197, 13.03315], [56.166006, 13.033961], [56.165014, 13.033716], [56.162875, 13.032334], [56.162553, 13.032358], [56.16215, 13.032882], [56.161835, 13.034612], [56.161914, 13.036066], [56.162786, 13.038647], [56.163299, 13.040978], [56.163281, 13.042934], [56.162845, 13.044039], [56.162884, 13.044395], [56.163989, 13.046679], [56.164794, 13.047698], [56.164971, 13.048247], [56.165058, 13.049185], [56.165072, 13.04979], [56.164664, 13.051103], [56.164252, 13.052196], [56.163557, 13.053146], [56.163478, 13.053683], [56.164092, 13.055337], [56.165073, 13.056123], [56.165642, 13.057278], [56.165933, 13.058664], [56.166038, 13.061193], [56.166288, 13.061792], [56.166713, 13.062342], [56.166801, 13.062794], [56.166637, 13.063792], [56.165425, 13.065851], [56.164893, 13.066242], [56.163136, 13.066332], [56.162173, 13.065449], [56.16134, 13.064241], [56.160439, 13.063477], [56.15927, 13.063525], [56.15853, 13.063384], [56.158107, 13.064242], [56.156768, 13.069782], [56.156514, 13.070339], [56.155842, 13.070968], [56.154854, 13.072568], [56.153773, 13.072699], [56.15358, 13.07292], [56.153204, 13.075028], [56.15278, 13.075957], [56.15249, 13.075834], [56.152205, 13.075317], [56.151734, 13.0738], [56.151522, 13.073655], [56.151188, 13.073647], [56.150438, 13.074018], [56.149825, 13.074849], [56.149238, 13.076113], [56.148638, 13.076618], [56.146567, 13.077077], [56.144888, 13.07779], [56.143802, 13.077677], [56.143147, 13.077378], [56.142787, 13.077507], [56.142275, 13.077983], [56.141574, 13.078916], [56.140631, 13.079775], [56.139953, 13.07997], [56.139173, 13.079937], [56.138725, 13.08015], [56.137228, 13.083173], [56.137594, 13.080102], [56.137209, 13.080166], [56.137215, 13.080806], [56.136878, 13.08308], [56.136788, 13.083068], [56.136572, 13.083528], [56.135578, 13.087173], [56.135351, 13.088519], [56.135264, 13.09045], [56.135095, 13.090849], [56.135057, 13.09155], [56.134718, 13.091633], [56.133932, 13.092797], [56.133213, 13.094643], [56.131649, 13.096087], [56.130394, 13.096211], [56.130043, 13.095857], [56.129912, 13.095149], [56.129888, 13.093307], [56.130012, 13.091872], [56.129695, 13.090595], [56.129326, 13.090545], [56.128288, 13.09159], [56.127406, 13.091977], [56.127268, 13.092173], [56.127093, 13.092981], [56.127117, 13.094511], [56.127871, 13.09758], [56.127975, 13.098399], [56.127761, 13.101134], [56.127549, 13.102015], [56.127192, 13.102694], [56.126631, 13.103354], [56.126276, 13.103379], [56.125811, 13.103799], [56.125208, 13.105568], [56.125068, 13.105678], [56.124623, 13.105165], [56.123203, 13.105313], [56.123081, 13.105737], [56.122428, 13.105207], [56.122565, 13.10446], [56.120951, 13.103576], [56.121068, 13.102914], [56.119129, 13.101983], [56.119042, 13.101952], [56.118679, 13.102791], [56.118381, 13.102319], [56.118776, 13.098441], [56.116014, 13.097083], [56.116371, 13.095338], [56.117587, 13.095083], [56.117381, 13.093157], [56.11687, 13.093075], [56.11689, 13.093402], [56.116361, 13.093767], [56.116255, 13.093461], [56.113008, 13.091853], [56.103706, 13.086032], [56.10384, 13.084094], [56.103786, 13.083343], [56.104037, 13.082183], [56.103883, 13.08213], [56.103534, 13.082157], [56.103367, 13.082298], [56.10366, 13.083674], [56.103617, 13.084898], [56.103129, 13.088181], [56.10289, 13.088311], [56.102914, 13.088984], [56.102787, 13.089653], [56.102428, 13.090821], [56.101129, 13.093586], [56.100205, 13.093977], [56.099845, 13.095097], [56.099268, 13.096104], [56.099144, 13.097335], [56.0981, 13.099133], [56.097483, 13.103035], [56.097624, 13.104069], [56.097308, 13.104751], [56.097054, 13.104288], [56.096367, 13.105223], [56.095709, 13.105371], [56.094343, 13.106138], [56.0938, 13.104806], [56.093975, 13.104632], [56.094078, 13.103677], [56.093665, 13.102889], [56.093153, 13.102895], [56.092763, 13.103069], [56.092446, 13.103719], [56.092303, 13.103746], [56.09181, 13.103398], [56.091571, 13.102789], [56.090935, 13.102066], [56.090584, 13.102012], [56.089983, 13.102299], [56.089569, 13.101623], [56.089056, 13.099622], [56.088433, 13.097966], [56.088516, 13.096065], [56.087421, 13.093348], [56.086561, 13.089322], [56.086415, 13.089205], [56.086519, 13.07956], [56.08552, 13.076424], [56.085779, 13.075617], [56.085747, 13.075026], [56.086942, 13.072007], [56.088576, 13.070448], [56.087828, 13.069863], [56.087126, 13.068948], [56.087193, 13.068575], [56.087368, 13.068339], [56.087324, 13.067873], [56.086993, 13.067297], [56.086785, 13.066293], [56.086337, 13.065962], [56.086455, 13.065354], [56.086157, 13.065386], [56.085728, 13.066367], [56.085135, 13.066887], [56.084804, 13.067483], [56.084572, 13.068387], [56.084604, 13.06939], [56.083963, 13.070475], [56.083949, 13.07087], [56.084251, 13.071971], [56.08418, 13.072287], [56.083944, 13.072412], [56.083357, 13.07242], [56.083207, 13.072578], [56.082978, 13.072596], [56.082966, 13.072818], [56.082431, 13.073068], [56.081887, 13.073266], [56.081687, 13.073135], [56.081418, 13.073145], [56.081247, 13.073474], [56.08083, 13.073363], [56.080587, 13.073135], [56.080374, 13.073171], [56.079545, 13.072707], [56.079196, 13.072774], [56.078887, 13.073141], [56.078737, 13.072916], [56.078501, 13.07296], [56.07814, 13.072721], [56.076778, 13.07287], [56.076391, 13.072378], [56.075529, 13.070631], [56.074507, 13.070142], [56.074897, 13.068559], [56.075842, 13.066463], [56.07665, 13.063757], [56.079018, 13.059436]];
+const DEFAULT_CENTER = [56.1309, 12.9917];
+
+// STATE
+let source = 'center';
+let gpsOn = false;
+let gpsWatchId = null;
+let gpsPos = null;
+let gpsAcc = null;
+let tapPos = null;
+let points = [];
+let sortBy = 'time'; // 'time' | 'dist'
+
+// MAP
+const map = L.map('map', { zoomControl: false, attributionControl: false }).setView(DEFAULT_CENTER, 14);
+
+const tiles = {
+  street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }),
+  terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 }),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 })
+};
+tiles.street.addTo(map);
+
+document.querySelectorAll('.layer-pill').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.layer-pill').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    Object.values(tiles).forEach(t => map.removeLayer(t));
+    tiles[this.dataset.layer].addTo(map);
+  });
+});
+
+if (ASTORP && ASTORP.length > 0) {
+    L.polygon(ASTORP, { color: 'rgba(59,130,246,.5)', weight: 1.5, fillColor: 'rgba(59,130,246,.03)', fillOpacity: 1, dashArray: '6,4' }).addTo(map);
+}
+
+L.control.scale({ position: 'bottomleft', imperial: false, maxWidth: 120 }).addTo(map);
+setTimeout(() => {
+  const scale = document.querySelector('.leaflet-control-scale');
+  if(scale) { scale.style.marginBottom = '180px'; scale.style.marginLeft = '12px'; }
+}, 500);
+
+let gpsMarker = null;
+let gpsCircle = null;
+let tapMarker = null;
+let pointLayer = L.layerGroup().addTo(map);
+
+// LOAD POINTS
+function loadPoints() {
+  try {
+    const data = localStorage.getItem('faltpunkter_db');
+    if (data) points = JSON.parse(data);
+  } catch (e) { console.error("Could not load points", e); }
+  updateUI();
+}
+
+function persistPoints() {
+  localStorage.setItem('faltpunkter_db', JSON.stringify(points));
+  updateUI();
+}
+
+// COORD DISPLAY
+function fmt(val) {
+  const s = val.toFixed(5);
+  const parts = s.split('.');
+  return { int: parts[0], dec: parts[1] };
+}
+
+function getCurrentCoords() {
+  if (source === 'gps' && gpsPos) return gpsPos;
+  if (source === 'tap' && tapPos) return tapPos;
+  const c = map.getCenter();
+  return [c.lat, c.lng];
+}
+
+function updateDisplay() {
+  let lat, lng, warn = false;
+  if (source === 'gps') {
+    if (gpsPos) { lat = gpsPos[0]; lng = gpsPos[1]; warn = gpsAcc > 30; }
+    else { lat = 0; lng = 0; warn = true; }
+  } else if (source === 'tap') {
+    if (tapPos) { lat = tapPos[0]; lng = tapPos[1]; }
+    else { const c = map.getCenter(); lat = c.lat; lng = c.lng; }
+  } else {
+    const c = map.getCenter();
+    lat = c.lat; lng = c.lng;
+  }
+
+  const la = fmt(lat), lo = fmt(lng);
+  const warnClass = warn ? ' warn' : '';
+  document.getElementById('latDigits').className = 'c-digits' + warnClass;
+  document.getElementById('latDigits').innerHTML = `<span class="int">${la.int}</span><span class="dot">.</span><span class="dec">${la.dec}</span>`;
+  document.getElementById('lngDigits').className = 'c-digits' + warnClass;
+  document.getElementById('lngDigits').innerHTML = `<span class="int">${lo.int}</span><span class="dot">.</span><span class="dec">${lo.dec}</span>`;
+}
+
+map.on('move', () => { if (source === 'center') updateDisplay(); });
+
+map.on('click', function(e) {
+  tapPos = [e.latlng.lat, e.latlng.lng];
+  if (tapMarker) map.removeLayer(tapMarker);
+  tapMarker = L.circleMarker(e.latlng, {
+    radius: 12, color: '#a855f7', fillColor: '#a855f7', fillOpacity: 0.25, weight: 2.5
+  }).addTo(map);
+  setSource('tap');
+  setTimeout(() => { if (tapMarker) { map.removeLayer(tapMarker); tapMarker = null; } }, 60000);
+});
+
+function setSource(mode) {
+  source = mode;
+  document.querySelectorAll('.source-pill').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  if (mode === 'gps' && !gpsOn) toggleGPS();
+  updateDisplay();
+}
+
+// GPS
+function toggleGPS() {
+  const badge = document.getElementById('gpsBadge');
+  const dot = document.getElementById('gpsDot');
+  const txt = document.getElementById('gpsText');
+
+  if (gpsOn) {
+    if (gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
+    gpsOn = false; gpsWatchId = null; gpsPos = null; gpsAcc = null;
+    badge.className = 'gps-badge';
+    dot.className = 'gps-dot off';
+    txt.textContent = 'GPS av';
+    document.getElementById('accTag').style.display = 'none';
+    if (gpsMarker) { map.removeLayer(gpsMarker); gpsMarker = null; }
+    if (gpsCircle) { map.removeLayer(gpsCircle); gpsCircle = null; }
+    if (source === 'gps') setSource('center');
+    renderList(); // Refresh distances (remove)
+    return;
+  }
+
+  if (!navigator.geolocation) { toast('Ingen GPS'); return; }
+  gpsOn = true;
+  badge.className = 'gps-badge tracking searching';
+  dot.className = 'gps-dot ok';
+  txt.textContent = 'Söker...';
+
+  gpsWatchId = navigator.geolocation.watchPosition(pos => {
+    gpsPos = [pos.coords.latitude, pos.coords.longitude];
+    gpsAcc = pos.coords.accuracy;
+
+    if (gpsMarker) map.removeLayer(gpsMarker);
+    gpsMarker = L.circleMarker(gpsPos, {
+      radius: 7, color: '#fff', fillColor: '#2ee8c8', fillOpacity: 1, weight: 2.5
+    }).addTo(map);
+
+    if (gpsCircle) map.removeLayer(gpsCircle);
+    gpsCircle = L.circle(gpsPos, {
+      radius: gpsAcc, color: 'rgba(46,232,200,.35)', fillColor: 'rgba(46,232,200,.08)',
+      fillOpacity: 1, weight: 1, dashArray: '4,4'
+    }).addTo(map);
+
+    badge.className = 'gps-badge tracking';
+    const q = gpsAcc < 10 ? 'good' : gpsAcc < 30 ? 'ok' : 'poor';
+    dot.className = 'gps-dot ' + q;
+    txt.textContent = `±${Math.round(gpsAcc)}m`;
+
+    const tag = document.getElementById('accTag');
+    tag.style.display = '';
+    tag.className = 'acc-tag ' + q;
+    document.getElementById('accVal').textContent = Math.round(gpsAcc);
+
+    if (source === 'gps') updateDisplay();
+    renderList(); // Live distance update
+  }, err => {
+    toast('GPS-fel');
+    toggleGPS();
+  }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 });
+}
+
+function centerOnGPS() {
+  if (gpsPos) { map.setView(gpsPos, Math.max(map.getZoom(), 17)); } 
+  else { if (!gpsOn) toggleGPS(); toast('Söker GPS...'); }
+}
+
+// HAVERSINE DISTANCE
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371e3; 
+  const p1 = lat1 * Math.PI/180;
+  const p2 = lat2 * Math.PI/180;
+  const dp = (lat2-lat1) * Math.PI/180;
+  const dl = (lon2-lon1) * Math.PI/180;
+  const a = Math.sin(dp/2)**2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2)**2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+function getDistances(pts) {
+  const refPos = gpsOn && gpsPos ? gpsPos : [map.getCenter().lat, map.getCenter().lng];
+  return pts.map(p => {
+    const dist = haversine(refPos[0], refPos[1], p.lat, p.lng);
+    return { ...p, dist };
+  });
+}
+
+function formatDist(m) {
+  if (m < 1000) return Math.round(m) + " m";
+  return (m / 1000).toFixed(1) + " km";
+}
+
+// SAVE LOGIC
+function openSaveModal() {
+  document.getElementById('ptName').value = '';
+  document.getElementById('ptTag').value = '';
+  document.getElementById('saveModalOverlay').classList.add('visible');
+  setTimeout(() => document.getElementById('ptName').focus(), 100);
+}
+
+function closeSaveModal() {
+  document.getElementById('saveModalOverlay').classList.remove('visible');
+}
+
+function savePoint() {
+  const name = document.getElementById('ptName').value.trim() || 'Namnlös Punkt';
+  const tag = document.getElementById('ptTag').value.trim();
+  const coords = getCurrentCoords();
+  
+  const pt = {
+    id: Date.now().toString(),
+    name,
+    tag,
+    lat: coords[0],
+    lng: coords[1],
+    date: new Date().toISOString()
+  };
+  
+  points.push(pt);
+  persistPoints();
+  closeSaveModal();
+  toast('📍 Position sparad');
+  
+  // Render marker
+  renderMarkers();
+}
+
+// RENDER MAP MARKERS
+function renderMarkers() {
+  pointLayer.clearLayers();
+  points.forEach(p => {
+    const marker = L.circleMarker([p.lat, p.lng], {
+      radius: 8, color: '#fff', fillColor: '#3b82f6', fillOpacity: 0.9, weight: 1.5
+    }).bindPopup(`<b>${p.name}</b><br>${p.tag ? `<span class="pt-tag">${p.tag}</span>` : ''}`);
+    pointLayer.addLayer(marker);
+  });
+}
+
+// LIST DRAWER
+function openDrawer() {
+  document.getElementById('listDrawer').classList.add('open');
+  renderList();
+}
+function closeDrawer() {
+  document.getElementById('listDrawer').classList.remove('open');
+}
+
+function setSort(mode) {
+  sortBy = mode;
+  document.getElementById('sortTime').classList.toggle('active', mode === 'time');
+  document.getElementById('sortDist').classList.toggle('active', mode === 'dist');
+  renderList();
+}
+
+function renderList() {
+  const listEl = document.getElementById('pointList');
+  if (points.length === 0) {
+    listEl.innerHTML = `<div class="empty-state"><span>📭</span>Inga sparade positioner ännu.<br>Använd "Spara"-knappen för att bygga din lista.</div>`;
+    return;
+  }
+
+  let items = getDistances(points);
+
+  if (sortBy === 'time') {
+    items.sort((a,b) => b.id.localeCompare(a.id)); // newest first
+  } else {
+    items.sort((a,b) => a.dist - b.dist); // closest first
+  }
+
+  const isGpsStr = (gpsOn && gpsPos) ? '📍' : '🎯 Karta';
+
+  let html = '';
+  items.forEach(p => {
+    html += `
+      <div class="pt-card">
+        <div class="pt-header">
+          <div class="pt-name">${p.name}</div>
+          <div class="pt-dist" title="Avstånd från ${isGpsStr}">⛕ ${formatDist(p.dist)}</div>
+        </div>
+        <div class="pt-info">
+          <div class="pt-coords">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</div>
+          ${p.tag ? `<div class="pt-tag">${p.tag}</div>` : ''}
+        </div>
+        <div class="pt-actions">
+          <button class="pt-btn nav" onclick="navTo('${p.id}')">Visa på karta</button>
+          <button class="pt-btn del" onclick="delPoint('${p.id}')">Radera</button>
+        </div>
+      </div>
+    `;
+  });
+  listEl.innerHTML = html;
+}
+
+function navTo(id) {
+  const p = points.find(x => x.id === id);
+  if (p) {
+    map.setView([p.lat, p.lng], 17);
+    closeDrawer();
+  }
+}
+
+function delPoint(id) {
+  if(confirm('Är du säker på att du vill radera denna position?')) {
+    points = points.filter(x => x.id !== id);
+    persistPoints();
+    if(document.getElementById('listDrawer').classList.contains('open')) renderList();
+    renderMarkers();
+    toast('Position raderad');
+  }
+}
+
+function updateUI() {
+  document.getElementById('btnCount').textContent = points.length;
+  document.getElementById('drCount').textContent = points.length;
+  renderMarkers();
+}
+
+function exportTSV() {
+  if(points.length === 0) return toast('Inget att exportera');
+  let tsv = "Namn\tTagg\tLatitud\tLongitud\tDatum\n";
+  points.forEach(p => {
+    tsv += `${p.name}\t${p.tag||''}\t${p.lat}\t${p.lng}\t${p.date}\n`;
+  });
+  const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Faltpunkter_Export_${new Date().toISOString().slice(0,10)}.tsv`;
+  a.click();
+}
+
+// TOAST
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// INIT
+loadPoints();
+updateDisplay();
+</script>
+</body>
+</html>

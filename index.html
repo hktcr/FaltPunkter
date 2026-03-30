@@ -74,6 +74,8 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 .acc-tag.good .val{color:var(--green)}
 .acc-tag.ok .val{color:var(--orange)}
 .acc-tag.poor .val{color:var(--red)}
+.astorp-badge{font-size:.7rem;font-weight:800;color:#fff;background:var(--accent);padding:6px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:.05em}
+.astorp-badge.out{background:rgba(255,255,255,.05);color:var(--text-dim)}
 
 .coords-block{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;gap:12px}
 .coords-left{flex:1;display:flex;flex-direction:column;gap:6px}
@@ -168,6 +170,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
       <button class="source-pill" data-mode="gps" onclick="setSource('gps')">📡 GPS</button>
       <button class="source-pill" data-mode="tap" onclick="setSource('tap')">👆 Tryck</button>
       <div class="source-spacer"></div>
+      <div class="astorp-badge" id="astorpBadge" style="display:none">📍 ÅSTORP</div>
       <div class="acc-tag" id="accTag" style="display:none">±<span class="val" id="accVal">?</span>m</div>
     </div>
     
@@ -324,6 +327,31 @@ function updateDisplay() {
   document.getElementById('latDigits').innerHTML = `<span class="int">${la.int}</span><span class="dot">.</span><span class="dec">${la.dec}</span>`;
   document.getElementById('lngDigits').className = 'c-digits' + warnClass;
   document.getElementById('lngDigits').innerHTML = `<span class="int">${lo.int}</span><span class="dot">.</span><span class="dec">${lo.dec}</span>`;
+
+  const astBadge = document.getElementById('astorpBadge');
+  if(astBadge) {
+    if (isPointInAstorp(lat, lng)) {
+      astBadge.style.display = '';
+      astBadge.className = 'astorp-badge';
+      astBadge.textContent = '📍 Åstorp';
+    } else {
+      astBadge.style.display = '';
+      astBadge.className = 'astorp-badge out';
+      astBadge.textContent = 'Utanför';
+    }
+  }
+}
+
+function isPointInAstorp(lat, lng) {
+  if (!ASTORP || ASTORP.length === 0) return false;
+  let x = lng, y = lat, inside = false;
+  for (let i = 0, j = ASTORP.length - 1; i < ASTORP.length; j = i++) {
+    let xi = ASTORP[i][1], yi = ASTORP[i][0];
+    let xj = ASTORP[j][1], yj = ASTORP[j][0];
+    let intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
 }
 
 map.on('move', () => { if (source === 'center') updateDisplay(); });

@@ -152,12 +152,12 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 .empty-state span{font-size:3rem;display:block;margin-bottom:12px;opacity:.5}
 
 /* GRID OVERLAY */
-.overlay-pills{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end}
-.overlay-pill{padding:8px 14px;border:none;border-radius:16px;background:var(--surface);color:var(--text-dim);font-family:var(--sans);font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.06em;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5)}
-.overlay-pill.active{background:rgba(168,85,247,.85);color:#fff;box-shadow:0 2px 16px rgba(168,85,247,.4)}
+.overlay-pills{display:flex;gap:6px;flex-wrap:wrap}
+.overlay-pill{padding:8px 14px;border:none;border-radius:14px;background:rgba(255,255,255,.06);color:var(--text-dim);font-family:var(--sans);font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--border)}
+.overlay-pill.active{background:rgba(168,85,247,.2);color:var(--purple);border-color:rgba(168,85,247,.4)}
 .overlay-pill.rook-pill{display:none}
 .overlay-pill.rook-pill.visible{display:block}
-.overlay-pill.rook-pill.active{background:rgba(16,185,129,.85);box-shadow:0 2px 16px rgba(16,185,129,.4)}
+.overlay-pill.rook-pill.active{background:rgba(16,185,129,.15);color:var(--green);border-color:rgba(16,185,129,.35)}
 
 .grid-popup{font-family:var(--sans);font-size:.85rem;line-height:1.5}
 .grid-popup .gp-id{font-family:var(--mono);font-size:1.1rem;font-weight:800;color:#4f46e5;margin-bottom:4px}
@@ -167,32 +167,20 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 .grid-popup .gp-status.empty{color:#94a3b8}
 .grid-popup .gp-group{font-size:.8rem;color:#059669;margin-top:2px}
 
-/* KPI strip — positioned above coord-panel, never overlapping */
-.kpi-strip-overlay{position:absolute;left:10px;right:10px;z-index:999;display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 16px;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5)}
-.kpi-strip-overlay.visible{display:flex;align-items:center;justify-content:space-between;gap:12px}
+/* KPI strip — inline in coord-panel */
+.kpi-strip-inline{display:none;align-items:center;gap:12px;padding:8px 0}
+.kpi-strip-inline.visible{display:flex}
 .kpi-label-ov{font-size:.72rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em}
-.kpi-val-ov{font-family:var(--mono);font-size:1.1rem;font-weight:800;color:var(--cyan)}
+.kpi-val-ov{font-family:var(--mono);font-size:1rem;font-weight:800;color:var(--cyan)}
 .kpi-bar{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;max-width:120px}
 .kpi-bar-fill{height:100%;background:var(--cyan);border-radius:3px;transition:width .4s}
 
-/* Responsive: smaller pills on very small phones */
 @media (max-width:360px){
   .layer-pill{padding:8px 10px;font-size:.7rem}
-  .overlay-pill{padding:6px 10px;font-size:.65rem}
+  .overlay-pill{padding:6px 10px;font-size:.68rem}
   .center-btn{width:40px;height:40px;font-size:1.1rem}
   .zoom-btn{width:38px;height:38px;font-size:1.1rem}
-  .kpi-val-ov{font-size:.9rem}
-}
-@media (max-height:600px){
-  .right-controls{gap:3px}
-  .layer-pill{padding:6px 10px;font-size:.68rem}
-  .overlay-pill{padding:5px 8px;font-size:.62rem}
-  .center-btn{width:36px;height:36px;font-size:1rem}
-  .zoom-btns{flex-direction:row}
-  .zoom-btn{width:36px;height:36px;font-size:1.1rem;border-radius:10px}
-  .kpi-strip-overlay{right:60px}
-  .kpi-label-ov{font-size:.65rem}
-  .kpi-val-ov{font-size:.9rem}
+  .kpi-val-ov{font-size:.85rem}
 }
 </style>
 </head>
@@ -208,21 +196,11 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
       <button class="layer-pill" data-layer="terrain">Terr</button>
       <button class="layer-pill" data-layer="satellite">Sat</button>
     </div>
-    <div class="overlay-pills">
-      <button class="overlay-pill" id="btnGrid" onclick="toggleGrid()">▦ Rutnät</button>
-      <button class="overlay-pill rook-pill" id="btnRook" onclick="toggleRookOverlay()">🐦 Råkor</button>
-    </div>
     <button class="center-btn" onclick="centerOnGPS()" title="Centrera">🎯</button>
     <div class="zoom-btns">
       <button class="zoom-btn" onclick="map.zoomIn()">+</button>
       <button class="zoom-btn" onclick="map.zoomOut()">−</button>
     </div>
-  </div>
-  <div class="kpi-strip-overlay" id="kpiOverlay">
-    <span class="kpi-label-ov">Inventerat</span>
-    <span class="kpi-val-ov" id="kpiVal">0/0</span>
-    <div class="kpi-bar"><div class="kpi-bar-fill" id="kpiBar" style="width:0%"></div></div>
-    <span class="kpi-label-ov" id="kpiPct">0%</span>
   </div>
 
   <div class="coord-panel">
@@ -231,6 +209,18 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
       <button class="source-pill" data-mode="gps" onclick="setSource('gps')">📡 GPS</button>
       <button class="source-pill" data-mode="tap" onclick="setSource('tap')">👆 Tryck</button>
       <div class="source-spacer"></div>
+      <div class="overlay-pills">
+        <button class="overlay-pill" id="btnGrid" onclick="toggleGrid()">▦ Rutnät</button>
+        <button class="overlay-pill rook-pill" id="btnRook" onclick="toggleRookOverlay()">🐦 Råkor</button>
+      </div>
+    </div>
+    <div class="kpi-strip-inline" id="kpiOverlay">
+      <span class="kpi-label-ov">Inventerat</span>
+      <span class="kpi-val-ov" id="kpiVal">0/0</span>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="kpiBar" style="width:0%"></div></div>
+      <span class="kpi-label-ov" id="kpiPct">0%</span>
+    </div>
+    <div class="coord-source" style="margin-bottom:0;padding-top:0">
       <div class="astorp-badge" id="astorpBadge" style="display:none">📍 ÅSTORP</div>
       <div class="acc-tag" id="accTag" style="display:none">±<span class="val" id="accVal">?</span>m</div>
     </div>
@@ -928,13 +918,7 @@ function updateKPI() {
   document.getElementById('kpiVal').textContent = `${inventoried}/${totalGrids}`;
   document.getElementById('kpiPct').textContent = `${pct}%`;
   document.getElementById('kpiBar').style.width = `${pct}%`;
-  const kpi = document.getElementById('kpiOverlay');
-  // Position above coord-panel dynamically
-  const panel = document.querySelector('.coord-panel');
-  if (panel) {
-    kpi.style.bottom = (panel.offsetHeight + 10) + 'px';
-  }
-  kpi.classList.add('visible');
+  document.getElementById('kpiOverlay').classList.add('visible');
 }
 </script>
 </body>

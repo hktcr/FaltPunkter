@@ -28,7 +28,11 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 #map{width:100%;height:100%;z-index:1}
 .leaflet-control-zoom{display:none!important}
 
-.layers{position:absolute;top:10px;right:10px;z-index:1000;display:flex;gap:3px}
+/* RIGHT CONTROL STACK — single flex column to prevent overlap */
+.right-controls{position:absolute;top:10px;right:10px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none}
+.right-controls>*{pointer-events:auto}
+
+.layers{display:flex;gap:3px}
 .layer-pill{padding:10px 16px;border:none;border-radius:20px;background:var(--surface);color:var(--text-dim);font-family:var(--sans);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.06em;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5)}
 .layer-pill.active{background:var(--accent);color:#fff;box-shadow:0 2px 16px rgba(59,130,246,.4)}
 
@@ -50,10 +54,10 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .gps-badge.searching .gps-dot{animation:pulse 1.2s infinite}
 
-.center-btn{position:absolute;top:70px;right:10px;z-index:1000;width:48px;height:48px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.3rem;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5);transition:all .2s}
+.center-btn{width:48px;height:48px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.3rem;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5);transition:all .2s}
 .center-btn:active{transform:scale(.92);background:var(--accent);color:#fff}
 
-.zoom-btns{position:absolute;right:10px;top:130px;z-index:1000;display:flex;flex-direction:column;gap:4px}
+.zoom-btns{display:flex;flex-direction:column;gap:4px}
 .zoom-btn{width:44px;height:44px;border-radius:12px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:1.3rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(16px);transition:all .15s}
 .zoom-btn:active{background:var(--surface2);transform:scale(.92)}
 
@@ -146,6 +150,50 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 /* Empty state */
 .empty-state{text-align:center;padding:40px 20px;color:var(--text-dim);font-weight:600}
 .empty-state span{font-size:3rem;display:block;margin-bottom:12px;opacity:.5}
+
+/* GRID OVERLAY */
+.overlay-pills{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end}
+.overlay-pill{padding:8px 14px;border:none;border-radius:16px;background:var(--surface);color:var(--text-dim);font-family:var(--sans);font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.06em;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5)}
+.overlay-pill.active{background:rgba(168,85,247,.85);color:#fff;box-shadow:0 2px 16px rgba(168,85,247,.4)}
+.overlay-pill.rook-pill{display:none}
+.overlay-pill.rook-pill.visible{display:block}
+.overlay-pill.rook-pill.active{background:rgba(16,185,129,.85);box-shadow:0 2px 16px rgba(16,185,129,.4)}
+
+.grid-popup{font-family:var(--sans);font-size:.85rem;line-height:1.5}
+.grid-popup .gp-id{font-family:var(--mono);font-size:1.1rem;font-weight:800;color:#4f46e5;margin-bottom:4px}
+.grid-popup .gp-coord{font-family:var(--mono);font-size:.8rem;color:#475569}
+.grid-popup .gp-status{margin-top:6px;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em}
+.grid-popup .gp-status.nest{color:#059669}
+.grid-popup .gp-status.empty{color:#94a3b8}
+.grid-popup .gp-group{font-size:.8rem;color:#059669;margin-top:2px}
+
+/* KPI strip — positioned above coord-panel, never overlapping */
+.kpi-strip-overlay{position:absolute;left:10px;right:10px;z-index:999;display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 16px;backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,0,0,.5)}
+.kpi-strip-overlay.visible{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.kpi-label-ov{font-size:.72rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em}
+.kpi-val-ov{font-family:var(--mono);font-size:1.1rem;font-weight:800;color:var(--cyan)}
+.kpi-bar{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;max-width:120px}
+.kpi-bar-fill{height:100%;background:var(--cyan);border-radius:3px;transition:width .4s}
+
+/* Responsive: smaller pills on very small phones */
+@media (max-width:360px){
+  .layer-pill{padding:8px 10px;font-size:.7rem}
+  .overlay-pill{padding:6px 10px;font-size:.65rem}
+  .center-btn{width:40px;height:40px;font-size:1.1rem}
+  .zoom-btn{width:38px;height:38px;font-size:1.1rem}
+  .kpi-val-ov{font-size:.9rem}
+}
+@media (max-height:600px){
+  .right-controls{gap:3px}
+  .layer-pill{padding:6px 10px;font-size:.68rem}
+  .overlay-pill{padding:5px 8px;font-size:.62rem}
+  .center-btn{width:36px;height:36px;font-size:1rem}
+  .zoom-btns{flex-direction:row}
+  .zoom-btn{width:36px;height:36px;font-size:1.1rem;border-radius:10px}
+  .kpi-strip-overlay{right:60px}
+  .kpi-label-ov{font-size:.65rem}
+  .kpi-val-ov{font-size:.9rem}
+}
 </style>
 </head>
 <body>
@@ -154,15 +202,27 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
   <div id="map"></div>
   <div class="crosshair"><div class="ch-ring"></div><div class="ch-v"></div><div class="ch-h"></div><div class="ch-dot"></div></div>
   <div class="gps-badge" id="gpsBadge" onclick="toggleGPS()"><div class="gps-dot off" id="gpsDot"></div><span class="gps-text" id="gpsText">GPS av</span></div>
-  <div class="layers">
-    <button class="layer-pill active" data-layer="street">Karta</button>
-    <button class="layer-pill" data-layer="terrain">Terr</button>
-    <button class="layer-pill" data-layer="satellite">Sat</button>
+  <div class="right-controls">
+    <div class="layers">
+      <button class="layer-pill active" data-layer="street">Karta</button>
+      <button class="layer-pill" data-layer="terrain">Terr</button>
+      <button class="layer-pill" data-layer="satellite">Sat</button>
+    </div>
+    <div class="overlay-pills">
+      <button class="overlay-pill" id="btnGrid" onclick="toggleGrid()">▦ Rutnät</button>
+      <button class="overlay-pill rook-pill" id="btnRook" onclick="toggleRookOverlay()">🐦 Råkor</button>
+    </div>
+    <button class="center-btn" onclick="centerOnGPS()" title="Centrera">🎯</button>
+    <div class="zoom-btns">
+      <button class="zoom-btn" onclick="map.zoomIn()">+</button>
+      <button class="zoom-btn" onclick="map.zoomOut()">−</button>
+    </div>
   </div>
-  <button class="center-btn" onclick="centerOnGPS()" title="Centrera">🎯</button>
-  <div class="zoom-btns">
-    <button class="zoom-btn" onclick="map.zoomIn()">+</button>
-    <button class="zoom-btn" onclick="map.zoomOut()">−</button>
+  <div class="kpi-strip-overlay" id="kpiOverlay">
+    <span class="kpi-label-ov">Inventerat</span>
+    <span class="kpi-val-ov" id="kpiVal">0/0</span>
+    <div class="kpi-bar"><div class="kpi-bar-fill" id="kpiBar" style="width:0%"></div></div>
+    <span class="kpi-label-ov" id="kpiPct">0%</span>
   </div>
 
   <div class="coord-panel">
@@ -617,6 +677,264 @@ function toast(msg) {
 // INIT
 loadPoints();
 updateDisplay();
+
+// ========== GRID OVERLAY ==========
+let gridData = null;
+let gridLayer = null;
+let gridCentroids = {}; // { gridId: [lat, lng] }
+let gridVisible = false;
+let rookData = null;
+let rookVisible = false;
+let rookLayer = null;
+
+const GRID_URLS = ['data/astorp-grid-250m.geojson', '../../Deployments/gaia-tools/rakor/data/astorp-grid-250m.geojson'];
+const ROOK_URLS = ['data/rakobservations.json', '../../Deployments/gaia-tools/rakor/data/rakobservations.json'];
+
+async function tryFetch(urls) {
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return await res.json();
+    } catch (e) { /* try next */ }
+  }
+  return null;
+}
+
+async function loadGridData() {
+  if (gridData) return gridData;
+  gridData = await tryFetch(GRID_URLS);
+  if (gridData) {
+    computeCentroids();
+    return gridData;
+  }
+  toast('❌ Kunde inte ladda rutnätet');
+  return null;
+}
+
+function computeCentroids() {
+  if (!gridData || !astorpBoundary) return;
+  gridData.features.forEach(f => {
+    const id = f.properties.gridId;
+    const coords = f.geometry.coordinates[0];
+    // Geometric center
+    const cx = (coords[0][0] + coords[2][0]) / 2;
+    const cy = (coords[0][1] + coords[2][1]) / 2;
+    
+    if (isPointInAstorp(cy, cx)) {
+      gridCentroids[id] = [cy, cx];
+    } else {
+      // Find nearest point on municipality boundary that's inside
+      try {
+        const pt = turf.point([cx, cy]);
+        // Get boundary as a line
+        const geom = astorpBoundary.features ? astorpBoundary.features[0].geometry : astorpBoundary.geometry;
+        let line;
+        if (geom.type === 'Polygon') {
+          line = turf.polygonToLine(turf.polygon(geom.coordinates));
+        } else if (geom.type === 'MultiPolygon') {
+          line = turf.polygonToLine(turf.multiPolygon(geom.coordinates));
+        }
+        if (line) {
+          const snapped = turf.nearestPointOnLine(line.type === 'FeatureCollection' ? line.features[0] : line, pt);
+          gridCentroids[id] = [snapped.geometry.coordinates[1], snapped.geometry.coordinates[0]];
+        } else {
+          gridCentroids[id] = [cy, cx]; // fallback
+        }
+      } catch (e) {
+        gridCentroids[id] = [cy, cx]; // fallback
+      }
+    }
+  });
+}
+
+async function toggleGrid() {
+  const btn = document.getElementById('btnGrid');
+  const rookBtn = document.getElementById('btnRook');
+  
+  if (gridVisible) {
+    // Turn off
+    if (gridLayer) { map.removeLayer(gridLayer); gridLayer = null; }
+    if (rookLayer) { map.removeLayer(rookLayer); rookLayer = null; }
+    gridVisible = false;
+    rookVisible = false;
+    btn.classList.remove('active');
+    rookBtn.classList.remove('active', 'visible');
+    document.getElementById('kpiOverlay').classList.remove('visible');
+    return;
+  }
+  
+  btn.textContent = '⏳ Laddar...';
+  const data = await loadGridData();
+  if (!data) { btn.textContent = '▦ Rutnät'; return; }
+  
+  gridVisible = true;
+  btn.classList.add('active');
+  btn.textContent = '▦ Rutnät';
+  rookBtn.classList.add('visible');
+  
+  renderGrid();
+}
+
+function renderGrid() {
+  if (gridLayer) map.removeLayer(gridLayer);
+  
+  gridLayer = L.geoJSON(gridData, {
+    style: function(feature) {
+      return {
+        color: 'rgba(168, 85, 247, 0.5)',
+        weight: 1,
+        fillColor: 'rgba(168, 85, 247, 0.06)',
+        fillOpacity: 1,
+        interactive: true
+      };
+    },
+    onEachFeature: function(feature, layer) {
+      layer.on('click', function(e) {
+        L.DomEvent.stopPropagation(e);
+        const id = feature.properties.gridId;
+        const center = gridCentroids[id] || [0,0];
+        let html = `<div class="grid-popup">`;
+        html += `<div class="gp-id">${id}</div>`;
+        html += `<div class="gp-coord">${center[0].toFixed(5)}, ${center[1].toFixed(5)}</div>`;
+        
+        // Add rook status if available
+        if (rookData && rookData.grids && rookData.grids[id]) {
+          const info = rookData.grids[id];
+          if (info.status === 'nest') {
+            html += `<div class="gp-status nest">● Bon</div>`;
+            if (info.group && rookData.groups[info.group]) {
+              const g = rookData.groups[info.group];
+              html += `<div class="gp-group">${g.label}: ${g.count} bon</div>`;
+            }
+          } else if (info.status === 'empty') {
+            html += `<div class="gp-status empty">○ Inventerad – inga bon</div>`;
+          }
+        }
+        html += `</div>`;
+        
+        L.popup({ closeButton: true, className: '' })
+          .setLatLng(e.latlng)
+          .setContent(html)
+          .openOn(map);
+      });
+    }
+  }).addTo(map);
+}
+
+async function loadRookData() {
+  if (rookData) return rookData;
+  rookData = await tryFetch(ROOK_URLS);
+  if (rookData) return rookData;
+  toast('❌ Kunde inte ladda råkdata');
+  return null;
+}
+
+async function toggleRookOverlay() {
+  const btn = document.getElementById('btnRook');
+  
+  if (rookVisible) {
+    rookVisible = false;
+    btn.classList.remove('active');
+    document.getElementById('kpiOverlay').classList.remove('visible');
+    // Reset grid colors
+    if (gridLayer) renderGrid();
+    return;
+  }
+  
+  const data = await loadRookData();
+  if (!data || !gridData) return;
+  
+  rookVisible = true;
+  btn.classList.add('active');
+  
+  renderRookOverlay();
+  updateKPI();
+}
+
+function renderRookOverlay() {
+  if (!gridData || !rookData) return;
+  if (gridLayer) map.removeLayer(gridLayer);
+  
+  gridLayer = L.geoJSON(gridData, {
+    style: function(feature) {
+      const id = feature.properties.gridId;
+      const info = rookData.grids ? rookData.grids[id] : null;
+      
+      if (info && info.status === 'nest') {
+        return {
+          color: 'rgba(16, 185, 129, 0.8)',
+          weight: 2,
+          fillColor: 'rgba(16, 185, 129, 0.35)',
+          fillOpacity: 1
+        };
+      } else if (info && info.status === 'empty') {
+        return {
+          color: 'rgba(148, 163, 184, 0.5)',
+          weight: 1,
+          fillColor: 'rgba(148, 163, 184, 0.12)',
+          fillOpacity: 1
+        };
+      } else {
+        // Not inventoried
+        return {
+          color: 'rgba(168, 85, 247, 0.25)',
+          weight: 0.5,
+          fillColor: 'rgba(168, 85, 247, 0.03)',
+          fillOpacity: 1
+        };
+      }
+    },
+    onEachFeature: function(feature, layer) {
+      layer.on('click', function(e) {
+        L.DomEvent.stopPropagation(e);
+        const id = feature.properties.gridId;
+        const center = gridCentroids[id] || [0,0];
+        let html = `<div class="grid-popup">`;
+        html += `<div class="gp-id">${id}</div>`;
+        html += `<div class="gp-coord">${center[0].toFixed(5)}, ${center[1].toFixed(5)}</div>`;
+        
+        if (rookData.grids && rookData.grids[id]) {
+          const info = rookData.grids[id];
+          if (info.status === 'nest') {
+            html += `<div class="gp-status nest">● Bon</div>`;
+            if (info.group && rookData.groups[info.group]) {
+              const g = rookData.groups[info.group];
+              html += `<div class="gp-group">${g.label}: ${g.count} bon</div>`;
+            }
+          } else {
+            html += `<div class="gp-status empty">○ Inventerad – inga bon</div>`;
+          }
+        } else {
+          html += `<div class="gp-status" style="color:var(--orange)">⚠ Ej inventerad</div>`;
+        }
+        html += `</div>`;
+        
+        L.popup({ closeButton: true })
+          .setLatLng(e.latlng)
+          .setContent(html)
+          .openOn(map);
+      });
+    }
+  }).addTo(map);
+}
+
+function updateKPI() {
+  if (!rookData || !gridData) return;
+  const totalGrids = gridData.features.length;
+  const inventoried = rookData.grids ? Object.keys(rookData.grids).length : 0;
+  const pct = ((inventoried / totalGrids) * 100).toFixed(1);
+  
+  document.getElementById('kpiVal').textContent = `${inventoried}/${totalGrids}`;
+  document.getElementById('kpiPct').textContent = `${pct}%`;
+  document.getElementById('kpiBar').style.width = `${pct}%`;
+  const kpi = document.getElementById('kpiOverlay');
+  // Position above coord-panel dynamically
+  const panel = document.querySelector('.coord-panel');
+  if (panel) {
+    kpi.style.bottom = (panel.offsetHeight + 10) + 'px';
+  }
+  kpi.classList.add('visible');
+}
 </script>
 </body>
 </html>

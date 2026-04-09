@@ -868,11 +868,12 @@ function renderRookOverlay() {
           fillOpacity: 1
         };
       } else if (info && info.status === 'empty') {
+        // Inventerad utan bon — "försvinner" visuellt
         return {
-          color: 'rgba(148, 163, 184, 0.5)',
-          weight: 1,
-          fillColor: 'rgba(148, 163, 184, 0.12)',
-          fillOpacity: 1
+          color: 'rgba(148, 163, 184, 0.15)',
+          weight: 0.5,
+          fillColor: 'transparent',
+          fillOpacity: 0
         };
       } else {
         // Not inventoried

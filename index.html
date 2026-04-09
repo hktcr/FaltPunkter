@@ -794,7 +794,7 @@ function renderGrid() {
             html += `<div class="gp-status nest">● Bon</div>`;
             if (info.group && rookData.groups[info.group]) {
               const g = rookData.groups[info.group];
-              html += `<div class="gp-group">${g.label}: ${g.count} bon</div>`;
+              html += `<div class="gp-group">${info.group}: ${g.count} bon</div>`;
             }
           } else if (info.status === 'empty') {
             html += `<div class="gp-status empty">○ Inventerad – inga bon</div>`;
@@ -890,7 +890,7 @@ function renderRookOverlay() {
             html += `<div class="gp-status nest">● Bon</div>`;
             if (info.group && rookData.groups[info.group]) {
               const g = rookData.groups[info.group];
-              html += `<div class="gp-group">${g.label}: ${g.count} bon</div>`;
+              html += `<div class="gp-group">${info.group}: ${g.count} bon</div>`;
             }
           } else {
             html += `<div class="gp-status empty">○ Inventerad – inga bon</div>`;

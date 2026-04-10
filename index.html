@@ -165,6 +165,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 .grid-popup .gp-status{margin-top:6px;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em}
 .grid-popup .gp-status.nest{color:#059669}
 .grid-popup .gp-status.empty{color:#94a3b8}
+.grid-popup .gp-status.recheck{color:#f59e0b}
 .grid-popup .gp-group{font-size:.8rem;color:#059669;margin-top:2px}
 
 /* KPI strip — inline in coord-panel */
@@ -796,6 +797,8 @@ function renderGrid() {
               const g = rookData.groups[info.group];
               html += `<div class="gp-group">${info.group}: ${g.count} bon</div>`;
             }
+          } else if (info.status === 'recheck') {
+            html += `<div class="gp-status recheck">⚠ Behöver kollas igen</div>`;
           } else if (info.status === 'empty') {
             html += `<div class="gp-status empty">○ Inventerad – inga bon</div>`;
           }
@@ -857,6 +860,14 @@ function renderRookOverlay() {
           fillColor: 'rgba(16, 185, 129, 0.35)',
           fillOpacity: 1
         };
+      } else if (info && info.status === 'recheck') {
+        // Behöver kollas igen — orange
+        return {
+          color: 'rgba(245, 158, 11, 0.8)',
+          weight: 2,
+          fillColor: 'rgba(245, 158, 11, 0.3)',
+          fillOpacity: 1
+        };
       } else if (info && info.status === 'empty') {
         // Inventerad utan bon — "försvinner" visuellt
         return {
@@ -866,11 +877,11 @@ function renderRookOverlay() {
           fillOpacity: 0
         };
       } else {
-        // Not inventoried
+        // Not inventoried — gul
         return {
-          color: 'rgba(168, 85, 247, 0.25)',
-          weight: 0.5,
-          fillColor: 'rgba(168, 85, 247, 0.03)',
+          color: 'rgba(250, 204, 21, 0.5)',
+          weight: 1,
+          fillColor: 'rgba(250, 204, 21, 0.15)',
           fillOpacity: 1
         };
       }
@@ -892,11 +903,13 @@ function renderRookOverlay() {
               const g = rookData.groups[info.group];
               html += `<div class="gp-group">${info.group}: ${g.count} bon</div>`;
             }
+          } else if (info.status === 'recheck') {
+            html += `<div class="gp-status recheck">⚠ Behöver kollas igen</div>`;
           } else {
             html += `<div class="gp-status empty">○ Inventerad – inga bon</div>`;
           }
         } else {
-          html += `<div class="gp-status" style="color:var(--orange)">⚠ Ej inventerad</div>`;
+          html += `<div class="gp-status" style="color:#facc15">◌ Ej inventerad</div>`;
         }
         html += `</div>`;
         

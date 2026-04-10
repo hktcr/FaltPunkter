@@ -31,6 +31,18 @@
     "J14": { "status": "nest", "group": "G9" },
     "K14": { "status": "nest", "group": "G10" },
     "L14": { "status": "nest", "group": "G10" },
+    "K19": { "status": "nest", "group": "G11" },
+    "K24": { "status": "nest", "group": "G12" },
+    "L23": { "status": "nest", "group": "G13" },
+    "N20": { "status": "nest", "group": "G14" },
+    "O22": { "status": "nest", "group": "G15" },
+    "P22": { "status": "nest", "group": "G15" },
+    "S24": { "status": "nest", "group": "G16" },
+    "P27": { "status": "nest", "group": "G17" },
+    "P26": { "status": "nest", "group": "G17" },
+    "S29": { "status": "nest", "group": "G18" },
+    "T29": { "status": "nest", "group": "G18" },
+    "U29": { "status": "nest", "group": "G18" },
     "AB34": { "status": "empty" },
     "AC33": { "status": "empty" },
     "AC34": { "status": "empty" },
@@ -209,6 +221,46 @@
       "lat": 56.10402,
       "lng": 12.87812,
       "session": "2026-04-03"
+    },
+    "G11": {
+      "label": "K19",
+      "count": 1,
+      "session": "2026-04-10"
+    },
+    "G12": {
+      "label": "K24",
+      "count": 24,
+      "session": "2026-04-10"
+    },
+    "G13": {
+      "label": "L23",
+      "count": 5,
+      "session": "2026-04-10"
+    },
+    "G14": {
+      "label": "N20",
+      "count": 61,
+      "session": "2026-04-10"
+    },
+    "G15": {
+      "label": "O22+P22",
+      "count": 49,
+      "session": "2026-04-10"
+    },
+    "G16": {
+      "label": "S24",
+      "count": 19,
+      "session": "2026-04-10"
+    },
+    "G17": {
+      "label": "P27+P26",
+      "count": 24,
+      "session": "2026-04-10"
+    },
+    "G18": {
+      "label": "S29+T29+U29",
+      "count": 30,
+      "session": "2026-04-10"
     }
   },
   "fieldnotes": [
@@ -235,6 +287,12 @@
       "total_points": 14,
       "total_clusters": 10,
       "empty_grids": 105
+    },
+    {
+      "session": "2026-04-10",
+      "note": "Inventering av råkbon 10 april 2026. Centrala/sydvästra området. 8 kluster identifierade: K19 (1), K24 (24), L23 (5), N20 (61), O22+P22 (49), S24 (19), P26+P27 (24), S29+T29+U29 (30).",
+      "total_nests": 213,
+      "total_clusters": 8
     }
   ]
 }

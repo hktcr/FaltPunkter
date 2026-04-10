@@ -1769,6 +1769,18 @@
     "K26": {
       "status": "nest",
       "group": "G19"
+    },
+    "AS50": {
+      "status": "empty"
+    },
+    "F28": {
+      "status": "empty"
+    },
+    "J28": {
+      "status": "empty"
+    },
+    "J29": {
+      "status": "empty"
     }
   },
   "groups": {

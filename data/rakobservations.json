@@ -1781,6 +1781,18 @@
     },
     "J29": {
       "status": "empty"
+    },
+    "BD25": {
+      "status": "nest",
+      "group": "G20"
+    },
+    "BF26": {
+      "status": "nest",
+      "group": "G21"
+    },
+    "BF27": {
+      "status": "nest",
+      "group": "G21"
     }
   },
   "groups": {
@@ -1908,6 +1920,14 @@
       "label": "J26+K26",
       "count": 32,
       "session": "2026-04-10"
+    },
+    "G20": {
+      "count": 3,
+      "date": "2026-04-10"
+    },
+    "G21": {
+      "count": 18,
+      "date": "2026-04-10"
     }
   },
   "fieldnotes": [

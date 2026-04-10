@@ -1793,6 +1793,558 @@
     "BF27": {
       "status": "nest",
       "group": "G21"
+    },
+    "BC20": {
+      "status": "empty"
+    },
+    "BC21": {
+      "status": "empty"
+    },
+    "BC22": {
+      "status": "empty"
+    },
+    "BC23": {
+      "status": "empty"
+    },
+    "BC24": {
+      "status": "empty"
+    },
+    "BD19": {
+      "status": "empty"
+    },
+    "BD20": {
+      "status": "empty"
+    },
+    "BD21": {
+      "status": "empty"
+    },
+    "BD22": {
+      "status": "empty"
+    },
+    "BD23": {
+      "status": "empty"
+    },
+    "BD24": {
+      "status": "empty"
+    },
+    "BD31": {
+      "status": "empty"
+    },
+    "BD32": {
+      "status": "empty"
+    },
+    "BD33": {
+      "status": "empty"
+    },
+    "BD34": {
+      "status": "empty"
+    },
+    "BE19": {
+      "status": "empty"
+    },
+    "BE20": {
+      "status": "empty"
+    },
+    "BE21": {
+      "status": "empty"
+    },
+    "BE22": {
+      "status": "empty"
+    },
+    "BE23": {
+      "status": "empty"
+    },
+    "BE24": {
+      "status": "empty"
+    },
+    "BE25": {
+      "status": "empty"
+    },
+    "BE26": {
+      "status": "empty"
+    },
+    "BE27": {
+      "status": "empty"
+    },
+    "BE31": {
+      "status": "empty"
+    },
+    "BE6": {
+      "status": "empty"
+    },
+    "BE7": {
+      "status": "empty"
+    },
+    "BE8": {
+      "status": "empty"
+    },
+    "BE9": {
+      "status": "empty"
+    },
+    "BF13": {
+      "status": "empty"
+    },
+    "BF14": {
+      "status": "empty"
+    },
+    "BF15": {
+      "status": "empty"
+    },
+    "BF16": {
+      "status": "empty"
+    },
+    "BF17": {
+      "status": "empty"
+    },
+    "BF18": {
+      "status": "empty"
+    },
+    "BF19": {
+      "status": "empty"
+    },
+    "BF2": {
+      "status": "empty"
+    },
+    "BF20": {
+      "status": "empty"
+    },
+    "BF21": {
+      "status": "empty"
+    },
+    "BF22": {
+      "status": "empty"
+    },
+    "BF23": {
+      "status": "empty"
+    },
+    "BF24": {
+      "status": "empty"
+    },
+    "BF25": {
+      "status": "empty"
+    },
+    "BF28": {
+      "status": "empty"
+    },
+    "BF29": {
+      "status": "empty"
+    },
+    "BF3": {
+      "status": "empty"
+    },
+    "BF31": {
+      "status": "empty"
+    },
+    "BF36": {
+      "status": "empty"
+    },
+    "BF4": {
+      "status": "empty"
+    },
+    "BF5": {
+      "status": "empty"
+    },
+    "BF6": {
+      "status": "empty"
+    },
+    "BF7": {
+      "status": "empty"
+    },
+    "BF8": {
+      "status": "empty"
+    },
+    "BF9": {
+      "status": "empty"
+    },
+    "BG1": {
+      "status": "empty"
+    },
+    "BG10": {
+      "status": "empty"
+    },
+    "BG11": {
+      "status": "empty"
+    },
+    "BG12": {
+      "status": "empty"
+    },
+    "BG13": {
+      "status": "empty"
+    },
+    "BG14": {
+      "status": "empty"
+    },
+    "BG15": {
+      "status": "empty"
+    },
+    "BG16": {
+      "status": "empty"
+    },
+    "BG17": {
+      "status": "empty"
+    },
+    "BG18": {
+      "status": "empty"
+    },
+    "BG19": {
+      "status": "empty"
+    },
+    "BG2": {
+      "status": "empty"
+    },
+    "BG20": {
+      "status": "empty"
+    },
+    "BG21": {
+      "status": "empty"
+    },
+    "BG22": {
+      "status": "empty"
+    },
+    "BG23": {
+      "status": "empty"
+    },
+    "BG24": {
+      "status": "empty"
+    },
+    "BG25": {
+      "status": "empty"
+    },
+    "BG26": {
+      "status": "empty"
+    },
+    "BG27": {
+      "status": "empty"
+    },
+    "BG28": {
+      "status": "empty"
+    },
+    "BG29": {
+      "status": "empty"
+    },
+    "BG3": {
+      "status": "empty"
+    },
+    "BG31": {
+      "status": "empty"
+    },
+    "BG35": {
+      "status": "empty"
+    },
+    "BG36": {
+      "status": "empty"
+    },
+    "BG37": {
+      "status": "empty"
+    },
+    "BG6": {
+      "status": "empty"
+    },
+    "BG7": {
+      "status": "empty"
+    },
+    "BG8": {
+      "status": "empty"
+    },
+    "BG9": {
+      "status": "empty"
+    },
+    "BH1": {
+      "status": "empty"
+    },
+    "BH10": {
+      "status": "empty"
+    },
+    "BH11": {
+      "status": "empty"
+    },
+    "BH12": {
+      "status": "empty"
+    },
+    "BH14": {
+      "status": "empty"
+    },
+    "BH15": {
+      "status": "empty"
+    },
+    "BH16": {
+      "status": "empty"
+    },
+    "BH17": {
+      "status": "empty"
+    },
+    "BH18": {
+      "status": "empty"
+    },
+    "BH19": {
+      "status": "empty"
+    },
+    "BH2": {
+      "status": "empty"
+    },
+    "BH20": {
+      "status": "empty"
+    },
+    "BH21": {
+      "status": "empty"
+    },
+    "BH22": {
+      "status": "empty"
+    },
+    "BH23": {
+      "status": "empty"
+    },
+    "BH24": {
+      "status": "empty"
+    },
+    "BH25": {
+      "status": "empty"
+    },
+    "BH26": {
+      "status": "empty"
+    },
+    "BH28": {
+      "status": "empty"
+    },
+    "BH29": {
+      "status": "empty"
+    },
+    "BH3": {
+      "status": "empty"
+    },
+    "BH31": {
+      "status": "empty"
+    },
+    "BH35": {
+      "status": "empty"
+    },
+    "BH36": {
+      "status": "empty"
+    },
+    "BH7": {
+      "status": "empty"
+    },
+    "BH8": {
+      "status": "empty"
+    },
+    "BH9": {
+      "status": "empty"
+    },
+    "BI10": {
+      "status": "empty"
+    },
+    "BI11": {
+      "status": "empty"
+    },
+    "BI12": {
+      "status": "empty"
+    },
+    "BI13": {
+      "status": "empty"
+    },
+    "BI15": {
+      "status": "empty"
+    },
+    "BI16": {
+      "status": "empty"
+    },
+    "BI17": {
+      "status": "empty"
+    },
+    "BI18": {
+      "status": "empty"
+    },
+    "BI19": {
+      "status": "empty"
+    },
+    "BI20": {
+      "status": "empty"
+    },
+    "BI21": {
+      "status": "empty"
+    },
+    "BI22": {
+      "status": "empty"
+    },
+    "BI23": {
+      "status": "empty"
+    },
+    "BI24": {
+      "status": "empty"
+    },
+    "BI25": {
+      "status": "empty"
+    },
+    "BI26": {
+      "status": "empty"
+    },
+    "BI29": {
+      "status": "empty"
+    },
+    "BI30": {
+      "status": "empty"
+    },
+    "BI31": {
+      "status": "empty"
+    },
+    "BJ12": {
+      "status": "empty"
+    },
+    "BJ13": {
+      "status": "empty"
+    },
+    "BJ17": {
+      "status": "empty"
+    },
+    "BJ18": {
+      "status": "empty"
+    },
+    "BJ19": {
+      "status": "empty"
+    },
+    "BJ20": {
+      "status": "empty"
+    },
+    "BJ21": {
+      "status": "empty"
+    },
+    "BJ22": {
+      "status": "empty"
+    },
+    "BJ23": {
+      "status": "empty"
+    },
+    "BJ24": {
+      "status": "empty"
+    },
+    "BJ25": {
+      "status": "empty"
+    },
+    "BJ26": {
+      "status": "empty"
+    },
+    "BJ29": {
+      "status": "empty"
+    },
+    "BJ30": {
+      "status": "empty"
+    },
+    "BK17": {
+      "status": "empty"
+    },
+    "BK18": {
+      "status": "empty"
+    },
+    "BK19": {
+      "status": "empty"
+    },
+    "BK20": {
+      "status": "empty"
+    },
+    "BK21": {
+      "status": "empty"
+    },
+    "BK22": {
+      "status": "empty"
+    },
+    "BK23": {
+      "status": "empty"
+    },
+    "BK24": {
+      "status": "empty"
+    },
+    "BK25": {
+      "status": "empty"
+    },
+    "BK26": {
+      "status": "empty"
+    },
+    "BK27": {
+      "status": "empty"
+    },
+    "BK28": {
+      "status": "empty"
+    },
+    "BL18": {
+      "status": "empty"
+    },
+    "BL19": {
+      "status": "empty"
+    },
+    "BL20": {
+      "status": "empty"
+    },
+    "BL21": {
+      "status": "empty"
+    },
+    "BL22": {
+      "status": "empty"
+    },
+    "BL23": {
+      "status": "empty"
+    },
+    "BL24": {
+      "status": "empty"
+    },
+    "BL25": {
+      "status": "empty"
+    },
+    "BL26": {
+      "status": "empty"
+    },
+    "BL27": {
+      "status": "empty"
+    },
+    "BL28": {
+      "status": "empty"
+    },
+    "BM18": {
+      "status": "empty"
+    },
+    "BM19": {
+      "status": "empty"
+    },
+    "BM24": {
+      "status": "empty"
+    },
+    "BM25": {
+      "status": "empty"
+    },
+    "BM26": {
+      "status": "empty"
+    },
+    "BM27": {
+      "status": "empty"
+    },
+    "BM28": {
+      "status": "empty"
+    },
+    "BN23": {
+      "status": "empty"
+    },
+    "BN24": {
+      "status": "empty"
+    },
+    "BN25": {
+      "status": "empty"
+    },
+    "BN26": {
+      "status": "empty"
+    },
+    "BN27": {
+      "status": "empty"
+    },
+    "BO23": {
+      "status": "empty"
+    },
+    "BO24": {
+      "status": "empty"
+    },
+    "BP23": {
+      "status": "empty"
+    },
+    "BP24": {
+      "status": "empty"
     }
   },
   "groups": {

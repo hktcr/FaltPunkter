@@ -1439,7 +1439,8 @@
       "status": "empty"
     },
     "J26": {
-      "status": "empty"
+      "status": "nest",
+      "group": "G19"
     },
     "J27": {
       "status": "empty"
@@ -1764,6 +1765,10 @@
     },
     "Z32": {
       "status": "empty"
+    },
+    "K26": {
+      "status": "nest",
+      "group": "G19"
     }
   },
   "groups": {
@@ -1886,6 +1891,11 @@
       "label": "S29+T29+U29",
       "count": 30,
       "session": "2026-04-10"
+    },
+    "G19": {
+      "label": "J26+K26",
+      "count": 32,
+      "session": "2026-04-10"
     }
   },
   "fieldnotes": [
@@ -1971,9 +1981,9 @@
     },
     {
       "session": "2026-04-10",
-      "note": "Inventering av råkbon 10 april 2026. Centrala/sydvästra området. 8 kluster identifierade: K19 (1), K24 (24), L23 (5), N20 (61), O22+P22 (49), S24 (19), P26+P27 (24), S29+T29+U29 (30). Tomma rutor markerade i admin: 426 nya.",
-      "total_nests": 213,
-      "total_clusters": 8,
+      "note": "Inventering av råkbon 10 april 2026. Centrala/sydvästra området. 9 kluster identifierade: K19 (1), K24 (24), J26+K26 (32), L23 (5), N20 (61), O22+P22 (49), S24 (19), P26+P27 (24), S29+T29+U29 (30). Tomma rutor markerade i admin: 426 nya.",
+      "total_nests": 245,
+      "total_clusters": 9,
       "empty_grids_added": 426
     }
   ]

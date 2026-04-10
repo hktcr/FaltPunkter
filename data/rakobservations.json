@@ -1,153 +1,1770 @@
 {
   "grids": {
-    "AS46": { "status": "nest", "group": "G1" },
-    "AS47": { "status": "nest", "group": "G1" },
-    "AS48": { "status": "nest", "group": "G1" },
-    "AT46": { "status": "nest", "group": "G1" },
-    "AT47": { "status": "nest", "group": "G1" },
-    "AT48": { "status": "nest", "group": "G1" },
-    "AU47": { "status": "nest", "group": "G1" },
-    "AK40": { "status": "nest", "group": "G2" },
-    "AK41": { "status": "nest", "group": "G2" },
-    "AJ39": { "status": "nest", "group": "G3" },
-    "AJ40": { "status": "nest", "group": "G3" },
-    "AA31": { "status": "nest", "group": "G4" },
-    "AA32": { "status": "nest", "group": "G4" },
-    "AB31": { "status": "nest", "group": "G4" },
-    "AB32": { "status": "nest", "group": "G4" },
-    "AB33": { "status": "nest", "group": "G4" },
-    "Y28": { "status": "nest", "group": "G5" },
-    "J12": { "status": "nest", "group": "G6" },
-    "J13": { "status": "nest", "group": "G6" },
-    "K12": { "status": "nest", "group": "G6" },
-    "K13": { "status": "nest", "group": "G6" },
-    "L13": { "status": "nest", "group": "G6" },
-    "H11": { "status": "nest", "group": "G7" },
-    "H12": { "status": "nest", "group": "G7" },
-    "I11": { "status": "nest", "group": "G7" },
-    "I12": { "status": "nest", "group": "G7" },
-    "H13": { "status": "nest", "group": "G8" },
-    "I14": { "status": "nest", "group": "G9" },
-    "J14": { "status": "nest", "group": "G9" },
-    "K14": { "status": "nest", "group": "G10" },
-    "L14": { "status": "nest", "group": "G10" },
-    "K19": { "status": "nest", "group": "G11" },
-    "K24": { "status": "nest", "group": "G12" },
-    "L23": { "status": "nest", "group": "G13" },
-    "N20": { "status": "nest", "group": "G14" },
-    "O22": { "status": "nest", "group": "G15" },
-    "P22": { "status": "nest", "group": "G15" },
-    "S24": { "status": "nest", "group": "G16" },
-    "P27": { "status": "nest", "group": "G17" },
-    "P26": { "status": "nest", "group": "G17" },
-    "S29": { "status": "nest", "group": "G18" },
-    "T29": { "status": "nest", "group": "G18" },
-    "U29": { "status": "nest", "group": "G18" },
-    "AB34": { "status": "empty" },
-    "AC33": { "status": "empty" },
-    "AC34": { "status": "empty" },
-    "AD33": { "status": "empty" },
-    "AD34": { "status": "empty" },
-    "AE34": { "status": "empty" },
-    "AE35": { "status": "empty" },
-    "AE36": { "status": "empty" },
-    "AF34": { "status": "empty" },
-    "AF35": { "status": "empty" },
-    "AF36": { "status": "empty" },
-    "AF37": { "status": "empty" },
-    "AG36": { "status": "empty" },
-    "AG37": { "status": "empty" },
-    "AH37": { "status": "empty" },
-    "AH38": { "status": "empty" },
-    "AH39": { "status": "empty" },
-    "AI38": { "status": "empty" },
-    "AI39": { "status": "empty" },
-    "AL41": { "status": "empty" },
-    "AL42": { "status": "empty" },
-    "AM42": { "status": "empty" },
-    "AN42": { "status": "empty" },
-    "AN43": { "status": "empty" },
-    "AO42": { "status": "empty" },
-    "AO43": { "status": "empty" },
-    "AO44": { "status": "empty" },
-    "AP43": { "status": "empty" },
-    "AP44": { "status": "empty" },
-    "AP45": { "status": "empty" },
-    "AQ45": { "status": "empty" },
-    "AQ46": { "status": "empty" },
-    "AR45": { "status": "empty" },
-    "AR46": { "status": "empty" },
-    "AS45": { "status": "empty" },
-    "AT45": { "status": "empty" },
-    "AU45": { "status": "empty" },
-    "AU46": { "status": "empty" },
-    "AV45": { "status": "empty" },
-    "AV46": { "status": "empty" },
-    "E11": { "status": "empty" },
-    "E12": { "status": "empty" },
-    "F10": { "status": "empty" },
-    "F11": { "status": "empty" },
-    "F12": { "status": "empty" },
-    "F13": { "status": "empty" },
-    "G10": { "status": "empty" },
-    "G11": { "status": "empty" },
-    "G12": { "status": "empty" },
-    "G13": { "status": "empty" },
-    "G14": { "status": "empty" },
-    "H10": { "status": "empty" },
-    "H14": { "status": "empty" },
-    "H15": { "status": "empty" },
-    "I10": { "status": "empty" },
-    "I13": { "status": "empty" },
-    "I15": { "status": "empty" },
-    "I16": { "status": "empty" },
-    "J15": { "status": "empty" },
-    "J16": { "status": "empty" },
-    "K15": { "status": "empty" },
-    "K16": { "status": "empty" },
-    "K17": { "status": "empty" },
-    "L15": { "status": "empty" },
-    "L16": { "status": "empty" },
-    "L17": { "status": "empty" },
-    "M13": { "status": "empty" },
-    "M14": { "status": "empty" },
-    "P14": { "status": "empty" },
-    "Q13": { "status": "empty" },
-    "Q14": { "status": "empty" },
-    "Q15": { "status": "empty" },
-    "Q16": { "status": "empty" },
-    "R14": { "status": "empty" },
-    "R15": { "status": "empty" },
-    "R16": { "status": "empty" },
-    "R17": { "status": "empty" },
-    "S16": { "status": "empty" },
-    "S17": { "status": "empty" },
-    "S18": { "status": "empty" },
-    "S19": { "status": "empty" },
-    "T18": { "status": "empty" },
-    "T19": { "status": "empty" },
-    "T20": { "status": "empty" },
-    "T21": { "status": "empty" },
-    "T22": { "status": "empty" },
-    "U18": { "status": "empty" },
-    "U19": { "status": "empty" },
-    "U20": { "status": "empty" },
-    "U21": { "status": "empty" },
-    "U22": { "status": "empty" },
-    "U23": { "status": "empty" },
-    "U24": { "status": "empty" },
-    "V23": { "status": "empty" },
-    "V24": { "status": "empty" },
-    "V25": { "status": "empty" },
-    "V26": { "status": "empty" },
-    "W24": { "status": "empty" },
-    "W25": { "status": "empty" },
-    "W26": { "status": "empty" },
-    "W27": { "status": "empty" },
-    "X28": { "status": "empty" },
-    "X29": { "status": "empty" },
-    "Y29": { "status": "empty" },
-    "Z29": { "status": "empty" }
+    "AS46": {
+      "status": "nest",
+      "group": "G1"
+    },
+    "AS47": {
+      "status": "nest",
+      "group": "G1"
+    },
+    "AS48": {
+      "status": "nest",
+      "group": "G1"
+    },
+    "AT46": {
+      "status": "nest",
+      "group": "G1"
+    },
+    "AT47": {
+      "status": "nest",
+      "group": "G1"
+    },
+    "AT48": {
+      "status": "nest",
+      "group": "G1"
+    },
+    "AU47": {
+      "status": "nest",
+      "group": "G1"
+    },
+    "AK40": {
+      "status": "nest",
+      "group": "G2"
+    },
+    "AK41": {
+      "status": "nest",
+      "group": "G2"
+    },
+    "AJ39": {
+      "status": "nest",
+      "group": "G3"
+    },
+    "AJ40": {
+      "status": "nest",
+      "group": "G3"
+    },
+    "AA31": {
+      "status": "nest",
+      "group": "G4"
+    },
+    "AA32": {
+      "status": "nest",
+      "group": "G4"
+    },
+    "AB31": {
+      "status": "nest",
+      "group": "G4"
+    },
+    "AB32": {
+      "status": "nest",
+      "group": "G4"
+    },
+    "AB33": {
+      "status": "nest",
+      "group": "G4"
+    },
+    "Y28": {
+      "status": "nest",
+      "group": "G5"
+    },
+    "J12": {
+      "status": "nest",
+      "group": "G6"
+    },
+    "J13": {
+      "status": "nest",
+      "group": "G6"
+    },
+    "K12": {
+      "status": "nest",
+      "group": "G6"
+    },
+    "K13": {
+      "status": "nest",
+      "group": "G6"
+    },
+    "L13": {
+      "status": "nest",
+      "group": "G6"
+    },
+    "H11": {
+      "status": "nest",
+      "group": "G7"
+    },
+    "H12": {
+      "status": "nest",
+      "group": "G7"
+    },
+    "I11": {
+      "status": "nest",
+      "group": "G7"
+    },
+    "I12": {
+      "status": "nest",
+      "group": "G7"
+    },
+    "H13": {
+      "status": "nest",
+      "group": "G8"
+    },
+    "I14": {
+      "status": "nest",
+      "group": "G9"
+    },
+    "J14": {
+      "status": "nest",
+      "group": "G9"
+    },
+    "K14": {
+      "status": "nest",
+      "group": "G10"
+    },
+    "L14": {
+      "status": "nest",
+      "group": "G10"
+    },
+    "K19": {
+      "status": "nest",
+      "group": "G11"
+    },
+    "K24": {
+      "status": "nest",
+      "group": "G12"
+    },
+    "L23": {
+      "status": "nest",
+      "group": "G13"
+    },
+    "N20": {
+      "status": "nest",
+      "group": "G14"
+    },
+    "O22": {
+      "status": "nest",
+      "group": "G15"
+    },
+    "P22": {
+      "status": "nest",
+      "group": "G15"
+    },
+    "S24": {
+      "status": "nest",
+      "group": "G16"
+    },
+    "P27": {
+      "status": "nest",
+      "group": "G17"
+    },
+    "P26": {
+      "status": "nest",
+      "group": "G17"
+    },
+    "S29": {
+      "status": "nest",
+      "group": "G18"
+    },
+    "T29": {
+      "status": "nest",
+      "group": "G18"
+    },
+    "U29": {
+      "status": "nest",
+      "group": "G18"
+    },
+    "AB34": {
+      "status": "empty"
+    },
+    "AC33": {
+      "status": "empty"
+    },
+    "AC34": {
+      "status": "empty"
+    },
+    "AD33": {
+      "status": "empty"
+    },
+    "AD34": {
+      "status": "empty"
+    },
+    "AE34": {
+      "status": "empty"
+    },
+    "AE35": {
+      "status": "empty"
+    },
+    "AE36": {
+      "status": "empty"
+    },
+    "AF34": {
+      "status": "empty"
+    },
+    "AF35": {
+      "status": "empty"
+    },
+    "AF36": {
+      "status": "empty"
+    },
+    "AF37": {
+      "status": "empty"
+    },
+    "AG36": {
+      "status": "empty"
+    },
+    "AG37": {
+      "status": "empty"
+    },
+    "AH37": {
+      "status": "empty"
+    },
+    "AH38": {
+      "status": "empty"
+    },
+    "AH39": {
+      "status": "empty"
+    },
+    "AI38": {
+      "status": "empty"
+    },
+    "AI39": {
+      "status": "empty"
+    },
+    "AL41": {
+      "status": "empty"
+    },
+    "AL42": {
+      "status": "empty"
+    },
+    "AM42": {
+      "status": "empty"
+    },
+    "AN42": {
+      "status": "empty"
+    },
+    "AN43": {
+      "status": "empty"
+    },
+    "AO42": {
+      "status": "empty"
+    },
+    "AO43": {
+      "status": "empty"
+    },
+    "AO44": {
+      "status": "empty"
+    },
+    "AP43": {
+      "status": "empty"
+    },
+    "AP44": {
+      "status": "empty"
+    },
+    "AP45": {
+      "status": "empty"
+    },
+    "AQ45": {
+      "status": "empty"
+    },
+    "AQ46": {
+      "status": "empty"
+    },
+    "AR45": {
+      "status": "empty"
+    },
+    "AR46": {
+      "status": "empty"
+    },
+    "AS45": {
+      "status": "empty"
+    },
+    "AT45": {
+      "status": "empty"
+    },
+    "AU45": {
+      "status": "empty"
+    },
+    "AU46": {
+      "status": "empty"
+    },
+    "AV45": {
+      "status": "empty"
+    },
+    "AV46": {
+      "status": "empty"
+    },
+    "E11": {
+      "status": "empty"
+    },
+    "E12": {
+      "status": "empty"
+    },
+    "F10": {
+      "status": "empty"
+    },
+    "F11": {
+      "status": "empty"
+    },
+    "F12": {
+      "status": "empty"
+    },
+    "F13": {
+      "status": "empty"
+    },
+    "G10": {
+      "status": "empty"
+    },
+    "G11": {
+      "status": "empty"
+    },
+    "G12": {
+      "status": "empty"
+    },
+    "G13": {
+      "status": "empty"
+    },
+    "G14": {
+      "status": "empty"
+    },
+    "H10": {
+      "status": "empty"
+    },
+    "H14": {
+      "status": "empty"
+    },
+    "H15": {
+      "status": "empty"
+    },
+    "I10": {
+      "status": "empty"
+    },
+    "I13": {
+      "status": "empty"
+    },
+    "I15": {
+      "status": "empty"
+    },
+    "I16": {
+      "status": "empty"
+    },
+    "J15": {
+      "status": "empty"
+    },
+    "J16": {
+      "status": "empty"
+    },
+    "K15": {
+      "status": "empty"
+    },
+    "K16": {
+      "status": "empty"
+    },
+    "K17": {
+      "status": "empty"
+    },
+    "L15": {
+      "status": "empty"
+    },
+    "L16": {
+      "status": "empty"
+    },
+    "L17": {
+      "status": "empty"
+    },
+    "M13": {
+      "status": "empty"
+    },
+    "M14": {
+      "status": "empty"
+    },
+    "P14": {
+      "status": "empty"
+    },
+    "Q13": {
+      "status": "empty"
+    },
+    "Q14": {
+      "status": "empty"
+    },
+    "Q15": {
+      "status": "empty"
+    },
+    "Q16": {
+      "status": "empty"
+    },
+    "R14": {
+      "status": "empty"
+    },
+    "R15": {
+      "status": "empty"
+    },
+    "R16": {
+      "status": "empty"
+    },
+    "R17": {
+      "status": "empty"
+    },
+    "S16": {
+      "status": "empty"
+    },
+    "S17": {
+      "status": "empty"
+    },
+    "S18": {
+      "status": "empty"
+    },
+    "S19": {
+      "status": "empty"
+    },
+    "T18": {
+      "status": "empty"
+    },
+    "T19": {
+      "status": "empty"
+    },
+    "T20": {
+      "status": "empty"
+    },
+    "T21": {
+      "status": "empty"
+    },
+    "T22": {
+      "status": "empty"
+    },
+    "U18": {
+      "status": "empty"
+    },
+    "U19": {
+      "status": "empty"
+    },
+    "U20": {
+      "status": "empty"
+    },
+    "U21": {
+      "status": "empty"
+    },
+    "U22": {
+      "status": "empty"
+    },
+    "U23": {
+      "status": "empty"
+    },
+    "U24": {
+      "status": "empty"
+    },
+    "V23": {
+      "status": "empty"
+    },
+    "V24": {
+      "status": "empty"
+    },
+    "V25": {
+      "status": "empty"
+    },
+    "V26": {
+      "status": "empty"
+    },
+    "W24": {
+      "status": "empty"
+    },
+    "W25": {
+      "status": "empty"
+    },
+    "W26": {
+      "status": "empty"
+    },
+    "W27": {
+      "status": "empty"
+    },
+    "X28": {
+      "status": "empty"
+    },
+    "X29": {
+      "status": "empty"
+    },
+    "Y29": {
+      "status": "empty"
+    },
+    "Z29": {
+      "status": "empty"
+    },
+    "A23": {
+      "status": "empty"
+    },
+    "AC35": {
+      "status": "empty"
+    },
+    "AC36": {
+      "status": "empty"
+    },
+    "AC38": {
+      "status": "empty"
+    },
+    "AC39": {
+      "status": "empty"
+    },
+    "AD35": {
+      "status": "empty"
+    },
+    "AD36": {
+      "status": "empty"
+    },
+    "AD37": {
+      "status": "empty"
+    },
+    "AD38": {
+      "status": "empty"
+    },
+    "AD39": {
+      "status": "empty"
+    },
+    "AD40": {
+      "status": "empty"
+    },
+    "AE37": {
+      "status": "empty"
+    },
+    "AE38": {
+      "status": "empty"
+    },
+    "AE39": {
+      "status": "empty"
+    },
+    "AE40": {
+      "status": "empty"
+    },
+    "AE41": {
+      "status": "empty"
+    },
+    "AE42": {
+      "status": "empty"
+    },
+    "AE43": {
+      "status": "empty"
+    },
+    "AE44": {
+      "status": "empty"
+    },
+    "AF38": {
+      "status": "empty"
+    },
+    "AF39": {
+      "status": "empty"
+    },
+    "AF40": {
+      "status": "empty"
+    },
+    "AF41": {
+      "status": "empty"
+    },
+    "AF42": {
+      "status": "empty"
+    },
+    "AF43": {
+      "status": "empty"
+    },
+    "AF44": {
+      "status": "empty"
+    },
+    "AF45": {
+      "status": "empty"
+    },
+    "AG38": {
+      "status": "empty"
+    },
+    "AG39": {
+      "status": "empty"
+    },
+    "AG40": {
+      "status": "empty"
+    },
+    "AG41": {
+      "status": "empty"
+    },
+    "AG42": {
+      "status": "empty"
+    },
+    "AG43": {
+      "status": "empty"
+    },
+    "AG44": {
+      "status": "empty"
+    },
+    "AG45": {
+      "status": "empty"
+    },
+    "AG46": {
+      "status": "empty"
+    },
+    "AG47": {
+      "status": "empty"
+    },
+    "AH40": {
+      "status": "empty"
+    },
+    "AH41": {
+      "status": "empty"
+    },
+    "AH42": {
+      "status": "empty"
+    },
+    "AH43": {
+      "status": "empty"
+    },
+    "AH44": {
+      "status": "empty"
+    },
+    "AH45": {
+      "status": "empty"
+    },
+    "AH46": {
+      "status": "empty"
+    },
+    "AH47": {
+      "status": "empty"
+    },
+    "AI40": {
+      "status": "empty"
+    },
+    "AI41": {
+      "status": "empty"
+    },
+    "AI42": {
+      "status": "empty"
+    },
+    "AI43": {
+      "status": "empty"
+    },
+    "AI44": {
+      "status": "empty"
+    },
+    "AI45": {
+      "status": "empty"
+    },
+    "AI46": {
+      "status": "empty"
+    },
+    "AI47": {
+      "status": "empty"
+    },
+    "AJ41": {
+      "status": "empty"
+    },
+    "AJ42": {
+      "status": "empty"
+    },
+    "AJ43": {
+      "status": "empty"
+    },
+    "AJ44": {
+      "status": "empty"
+    },
+    "AJ45": {
+      "status": "empty"
+    },
+    "AJ46": {
+      "status": "empty"
+    },
+    "AJ47": {
+      "status": "empty"
+    },
+    "AK42": {
+      "status": "empty"
+    },
+    "AK43": {
+      "status": "empty"
+    },
+    "AK44": {
+      "status": "empty"
+    },
+    "AK45": {
+      "status": "empty"
+    },
+    "AK46": {
+      "status": "empty"
+    },
+    "AK47": {
+      "status": "empty"
+    },
+    "AL43": {
+      "status": "empty"
+    },
+    "AL44": {
+      "status": "empty"
+    },
+    "AL45": {
+      "status": "empty"
+    },
+    "AL46": {
+      "status": "empty"
+    },
+    "AL47": {
+      "status": "empty"
+    },
+    "AM43": {
+      "status": "empty"
+    },
+    "AM44": {
+      "status": "empty"
+    },
+    "AM45": {
+      "status": "empty"
+    },
+    "AM46": {
+      "status": "empty"
+    },
+    "AM47": {
+      "status": "empty"
+    },
+    "AN44": {
+      "status": "empty"
+    },
+    "AN45": {
+      "status": "empty"
+    },
+    "AN46": {
+      "status": "empty"
+    },
+    "AN47": {
+      "status": "empty"
+    },
+    "AO45": {
+      "status": "empty"
+    },
+    "AO46": {
+      "status": "empty"
+    },
+    "AO47": {
+      "status": "empty"
+    },
+    "AO48": {
+      "status": "empty"
+    },
+    "AP41": {
+      "status": "empty"
+    },
+    "AP42": {
+      "status": "empty"
+    },
+    "AP46": {
+      "status": "empty"
+    },
+    "AP47": {
+      "status": "empty"
+    },
+    "AP48": {
+      "status": "empty"
+    },
+    "AP49": {
+      "status": "empty"
+    },
+    "AQ41": {
+      "status": "empty"
+    },
+    "AQ42": {
+      "status": "empty"
+    },
+    "AQ43": {
+      "status": "empty"
+    },
+    "AQ44": {
+      "status": "empty"
+    },
+    "AQ47": {
+      "status": "empty"
+    },
+    "AQ48": {
+      "status": "empty"
+    },
+    "AQ49": {
+      "status": "empty"
+    },
+    "AQ50": {
+      "status": "empty"
+    },
+    "AR41": {
+      "status": "empty"
+    },
+    "AR42": {
+      "status": "empty"
+    },
+    "AR43": {
+      "status": "empty"
+    },
+    "AR44": {
+      "status": "empty"
+    },
+    "AR47": {
+      "status": "empty"
+    },
+    "AR48": {
+      "status": "empty"
+    },
+    "AR49": {
+      "status": "empty"
+    },
+    "AR50": {
+      "status": "empty"
+    },
+    "AS41": {
+      "status": "empty"
+    },
+    "AS42": {
+      "status": "empty"
+    },
+    "AS43": {
+      "status": "empty"
+    },
+    "AS44": {
+      "status": "empty"
+    },
+    "AS49": {
+      "status": "empty"
+    },
+    "AS51": {
+      "status": "empty"
+    },
+    "AT38": {
+      "status": "empty"
+    },
+    "AT39": {
+      "status": "empty"
+    },
+    "AT40": {
+      "status": "empty"
+    },
+    "AT41": {
+      "status": "empty"
+    },
+    "AT42": {
+      "status": "empty"
+    },
+    "AT43": {
+      "status": "empty"
+    },
+    "AT44": {
+      "status": "empty"
+    },
+    "AU38": {
+      "status": "empty"
+    },
+    "AU39": {
+      "status": "empty"
+    },
+    "AU40": {
+      "status": "empty"
+    },
+    "AU41": {
+      "status": "empty"
+    },
+    "AU42": {
+      "status": "empty"
+    },
+    "AU43": {
+      "status": "empty"
+    },
+    "AU44": {
+      "status": "empty"
+    },
+    "AU48": {
+      "status": "empty"
+    },
+    "AV33": {
+      "status": "empty"
+    },
+    "AV34": {
+      "status": "empty"
+    },
+    "AV35": {
+      "status": "empty"
+    },
+    "AV36": {
+      "status": "empty"
+    },
+    "AV37": {
+      "status": "empty"
+    },
+    "AV38": {
+      "status": "empty"
+    },
+    "AV39": {
+      "status": "empty"
+    },
+    "AV40": {
+      "status": "empty"
+    },
+    "AV41": {
+      "status": "empty"
+    },
+    "AV42": {
+      "status": "empty"
+    },
+    "AV43": {
+      "status": "empty"
+    },
+    "AV44": {
+      "status": "empty"
+    },
+    "AV47": {
+      "status": "empty"
+    },
+    "AW33": {
+      "status": "empty"
+    },
+    "AW34": {
+      "status": "empty"
+    },
+    "AW35": {
+      "status": "empty"
+    },
+    "AW36": {
+      "status": "empty"
+    },
+    "AW37": {
+      "status": "empty"
+    },
+    "AW38": {
+      "status": "empty"
+    },
+    "AW39": {
+      "status": "empty"
+    },
+    "AW40": {
+      "status": "empty"
+    },
+    "AW41": {
+      "status": "empty"
+    },
+    "AW42": {
+      "status": "empty"
+    },
+    "AW43": {
+      "status": "empty"
+    },
+    "AW44": {
+      "status": "empty"
+    },
+    "AW45": {
+      "status": "empty"
+    },
+    "AW46": {
+      "status": "empty"
+    },
+    "AX33": {
+      "status": "empty"
+    },
+    "AX34": {
+      "status": "empty"
+    },
+    "AX35": {
+      "status": "empty"
+    },
+    "AX36": {
+      "status": "empty"
+    },
+    "AX41": {
+      "status": "empty"
+    },
+    "AX42": {
+      "status": "empty"
+    },
+    "AX43": {
+      "status": "empty"
+    },
+    "AX44": {
+      "status": "empty"
+    },
+    "AX45": {
+      "status": "empty"
+    },
+    "AY32": {
+      "status": "empty"
+    },
+    "AY33": {
+      "status": "empty"
+    },
+    "AY34": {
+      "status": "empty"
+    },
+    "AY35": {
+      "status": "empty"
+    },
+    "AZ32": {
+      "status": "empty"
+    },
+    "AZ33": {
+      "status": "empty"
+    },
+    "AZ34": {
+      "status": "empty"
+    },
+    "AZ35": {
+      "status": "empty"
+    },
+    "B22": {
+      "status": "empty"
+    },
+    "B23": {
+      "status": "empty"
+    },
+    "B24": {
+      "status": "empty"
+    },
+    "B25": {
+      "status": "empty"
+    },
+    "BA32": {
+      "status": "empty"
+    },
+    "BA33": {
+      "status": "empty"
+    },
+    "BA34": {
+      "status": "empty"
+    },
+    "BA35": {
+      "status": "empty"
+    },
+    "BA36": {
+      "status": "empty"
+    },
+    "BA37": {
+      "status": "empty"
+    },
+    "BA38": {
+      "status": "empty"
+    },
+    "BA39": {
+      "status": "empty"
+    },
+    "BA40": {
+      "status": "empty"
+    },
+    "BB32": {
+      "status": "empty"
+    },
+    "BB33": {
+      "status": "empty"
+    },
+    "BB34": {
+      "status": "empty"
+    },
+    "BB35": {
+      "status": "empty"
+    },
+    "BB36": {
+      "status": "empty"
+    },
+    "BB37": {
+      "status": "empty"
+    },
+    "BB38": {
+      "status": "empty"
+    },
+    "BB39": {
+      "status": "empty"
+    },
+    "BB40": {
+      "status": "empty"
+    },
+    "BB41": {
+      "status": "empty"
+    },
+    "BC32": {
+      "status": "empty"
+    },
+    "BC33": {
+      "status": "empty"
+    },
+    "BC34": {
+      "status": "empty"
+    },
+    "BC35": {
+      "status": "empty"
+    },
+    "BC36": {
+      "status": "empty"
+    },
+    "BC37": {
+      "status": "empty"
+    },
+    "BC38": {
+      "status": "empty"
+    },
+    "BC39": {
+      "status": "empty"
+    },
+    "BC40": {
+      "status": "empty"
+    },
+    "BC41": {
+      "status": "empty"
+    },
+    "BD35": {
+      "status": "empty"
+    },
+    "BD36": {
+      "status": "empty"
+    },
+    "BD37": {
+      "status": "empty"
+    },
+    "BD38": {
+      "status": "empty"
+    },
+    "BD39": {
+      "status": "empty"
+    },
+    "BD40": {
+      "status": "empty"
+    },
+    "BD41": {
+      "status": "empty"
+    },
+    "BE36": {
+      "status": "empty"
+    },
+    "BE37": {
+      "status": "empty"
+    },
+    "BE38": {
+      "status": "empty"
+    },
+    "BE39": {
+      "status": "empty"
+    },
+    "BE40": {
+      "status": "empty"
+    },
+    "BE41": {
+      "status": "empty"
+    },
+    "BE42": {
+      "status": "empty"
+    },
+    "BF37": {
+      "status": "empty"
+    },
+    "BF38": {
+      "status": "empty"
+    },
+    "BF39": {
+      "status": "empty"
+    },
+    "BF40": {
+      "status": "empty"
+    },
+    "BF41": {
+      "status": "empty"
+    },
+    "BF42": {
+      "status": "empty"
+    },
+    "C20": {
+      "status": "empty"
+    },
+    "C21": {
+      "status": "empty"
+    },
+    "C22": {
+      "status": "empty"
+    },
+    "C23": {
+      "status": "empty"
+    },
+    "C24": {
+      "status": "empty"
+    },
+    "C25": {
+      "status": "empty"
+    },
+    "D14": {
+      "status": "empty"
+    },
+    "D15": {
+      "status": "empty"
+    },
+    "D16": {
+      "status": "empty"
+    },
+    "D17": {
+      "status": "empty"
+    },
+    "D18": {
+      "status": "empty"
+    },
+    "D19": {
+      "status": "empty"
+    },
+    "D20": {
+      "status": "empty"
+    },
+    "D21": {
+      "status": "empty"
+    },
+    "D22": {
+      "status": "empty"
+    },
+    "D23": {
+      "status": "empty"
+    },
+    "D24": {
+      "status": "empty"
+    },
+    "D25": {
+      "status": "empty"
+    },
+    "D26": {
+      "status": "empty"
+    },
+    "D27": {
+      "status": "empty"
+    },
+    "E14": {
+      "status": "empty"
+    },
+    "E15": {
+      "status": "empty"
+    },
+    "E16": {
+      "status": "empty"
+    },
+    "E17": {
+      "status": "empty"
+    },
+    "E18": {
+      "status": "empty"
+    },
+    "E19": {
+      "status": "empty"
+    },
+    "E20": {
+      "status": "empty"
+    },
+    "E21": {
+      "status": "empty"
+    },
+    "E22": {
+      "status": "empty"
+    },
+    "E23": {
+      "status": "empty"
+    },
+    "E24": {
+      "status": "empty"
+    },
+    "E25": {
+      "status": "empty"
+    },
+    "E26": {
+      "status": "empty"
+    },
+    "E27": {
+      "status": "empty"
+    },
+    "F14": {
+      "status": "empty"
+    },
+    "F15": {
+      "status": "empty"
+    },
+    "F16": {
+      "status": "empty"
+    },
+    "F17": {
+      "status": "empty"
+    },
+    "F18": {
+      "status": "empty"
+    },
+    "F19": {
+      "status": "empty"
+    },
+    "F20": {
+      "status": "empty"
+    },
+    "F21": {
+      "status": "empty"
+    },
+    "F22": {
+      "status": "empty"
+    },
+    "F23": {
+      "status": "empty"
+    },
+    "F24": {
+      "status": "empty"
+    },
+    "F25": {
+      "status": "empty"
+    },
+    "F26": {
+      "status": "empty"
+    },
+    "F27": {
+      "status": "empty"
+    },
+    "G15": {
+      "status": "empty"
+    },
+    "G16": {
+      "status": "empty"
+    },
+    "G17": {
+      "status": "empty"
+    },
+    "G18": {
+      "status": "empty"
+    },
+    "G19": {
+      "status": "empty"
+    },
+    "G20": {
+      "status": "empty"
+    },
+    "G21": {
+      "status": "empty"
+    },
+    "G22": {
+      "status": "empty"
+    },
+    "G23": {
+      "status": "empty"
+    },
+    "G24": {
+      "status": "empty"
+    },
+    "G25": {
+      "status": "empty"
+    },
+    "G26": {
+      "status": "empty"
+    },
+    "G27": {
+      "status": "empty"
+    },
+    "H16": {
+      "status": "empty"
+    },
+    "H17": {
+      "status": "empty"
+    },
+    "H18": {
+      "status": "empty"
+    },
+    "H19": {
+      "status": "empty"
+    },
+    "H20": {
+      "status": "empty"
+    },
+    "H21": {
+      "status": "empty"
+    },
+    "H22": {
+      "status": "empty"
+    },
+    "H23": {
+      "status": "empty"
+    },
+    "H24": {
+      "status": "empty"
+    },
+    "H25": {
+      "status": "empty"
+    },
+    "H26": {
+      "status": "empty"
+    },
+    "H27": {
+      "status": "empty"
+    },
+    "I17": {
+      "status": "empty"
+    },
+    "I18": {
+      "status": "empty"
+    },
+    "I19": {
+      "status": "empty"
+    },
+    "I20": {
+      "status": "empty"
+    },
+    "I21": {
+      "status": "empty"
+    },
+    "I22": {
+      "status": "empty"
+    },
+    "I23": {
+      "status": "empty"
+    },
+    "I24": {
+      "status": "empty"
+    },
+    "I25": {
+      "status": "empty"
+    },
+    "I26": {
+      "status": "empty"
+    },
+    "I27": {
+      "status": "empty"
+    },
+    "J17": {
+      "status": "empty"
+    },
+    "J18": {
+      "status": "empty"
+    },
+    "J19": {
+      "status": "empty"
+    },
+    "J20": {
+      "status": "empty"
+    },
+    "J21": {
+      "status": "empty"
+    },
+    "J22": {
+      "status": "empty"
+    },
+    "J23": {
+      "status": "empty"
+    },
+    "J24": {
+      "status": "empty"
+    },
+    "J25": {
+      "status": "empty"
+    },
+    "J26": {
+      "status": "empty"
+    },
+    "J27": {
+      "status": "empty"
+    },
+    "K18": {
+      "status": "empty"
+    },
+    "K20": {
+      "status": "empty"
+    },
+    "K21": {
+      "status": "empty"
+    },
+    "K22": {
+      "status": "empty"
+    },
+    "K23": {
+      "status": "empty"
+    },
+    "K25": {
+      "status": "empty"
+    },
+    "K27": {
+      "status": "empty"
+    },
+    "K28": {
+      "status": "empty"
+    },
+    "K29": {
+      "status": "empty"
+    },
+    "L19": {
+      "status": "empty"
+    },
+    "L20": {
+      "status": "empty"
+    },
+    "L21": {
+      "status": "empty"
+    },
+    "L22": {
+      "status": "empty"
+    },
+    "L24": {
+      "status": "empty"
+    },
+    "L25": {
+      "status": "empty"
+    },
+    "L26": {
+      "status": "empty"
+    },
+    "L27": {
+      "status": "empty"
+    },
+    "L28": {
+      "status": "empty"
+    },
+    "L29": {
+      "status": "empty"
+    },
+    "M19": {
+      "status": "empty"
+    },
+    "M20": {
+      "status": "empty"
+    },
+    "M21": {
+      "status": "empty"
+    },
+    "M22": {
+      "status": "empty"
+    },
+    "M23": {
+      "status": "empty"
+    },
+    "M24": {
+      "status": "empty"
+    },
+    "M25": {
+      "status": "empty"
+    },
+    "M26": {
+      "status": "empty"
+    },
+    "M27": {
+      "status": "empty"
+    },
+    "M28": {
+      "status": "empty"
+    },
+    "M29": {
+      "status": "empty"
+    },
+    "M30": {
+      "status": "empty"
+    },
+    "M31": {
+      "status": "empty"
+    },
+    "N19": {
+      "status": "empty"
+    },
+    "N21": {
+      "status": "empty"
+    },
+    "N22": {
+      "status": "empty"
+    },
+    "N23": {
+      "status": "empty"
+    },
+    "N24": {
+      "status": "empty"
+    },
+    "N25": {
+      "status": "empty"
+    },
+    "N26": {
+      "status": "empty"
+    },
+    "N27": {
+      "status": "empty"
+    },
+    "N28": {
+      "status": "empty"
+    },
+    "N29": {
+      "status": "empty"
+    },
+    "N30": {
+      "status": "empty"
+    },
+    "N31": {
+      "status": "empty"
+    },
+    "O20": {
+      "status": "empty"
+    },
+    "O21": {
+      "status": "empty"
+    },
+    "O23": {
+      "status": "empty"
+    },
+    "O24": {
+      "status": "empty"
+    },
+    "O25": {
+      "status": "empty"
+    },
+    "O26": {
+      "status": "empty"
+    },
+    "O27": {
+      "status": "empty"
+    },
+    "O28": {
+      "status": "empty"
+    },
+    "O29": {
+      "status": "empty"
+    },
+    "O30": {
+      "status": "empty"
+    },
+    "O31": {
+      "status": "empty"
+    },
+    "P21": {
+      "status": "empty"
+    },
+    "P23": {
+      "status": "empty"
+    },
+    "P24": {
+      "status": "empty"
+    },
+    "P25": {
+      "status": "empty"
+    },
+    "P28": {
+      "status": "empty"
+    },
+    "P29": {
+      "status": "empty"
+    },
+    "P30": {
+      "status": "empty"
+    },
+    "P31": {
+      "status": "empty"
+    },
+    "Q21": {
+      "status": "empty"
+    },
+    "Q22": {
+      "status": "empty"
+    },
+    "Q23": {
+      "status": "empty"
+    },
+    "Q24": {
+      "status": "empty"
+    },
+    "Q25": {
+      "status": "empty"
+    },
+    "Q26": {
+      "status": "empty"
+    },
+    "Q27": {
+      "status": "empty"
+    },
+    "Q28": {
+      "status": "empty"
+    },
+    "R21": {
+      "status": "empty"
+    },
+    "R22": {
+      "status": "empty"
+    },
+    "R23": {
+      "status": "empty"
+    },
+    "R24": {
+      "status": "empty"
+    },
+    "R25": {
+      "status": "empty"
+    },
+    "R26": {
+      "status": "empty"
+    },
+    "R27": {
+      "status": "empty"
+    },
+    "R28": {
+      "status": "empty"
+    },
+    "R29": {
+      "status": "empty"
+    },
+    "S23": {
+      "status": "empty"
+    },
+    "S25": {
+      "status": "empty"
+    },
+    "S26": {
+      "status": "empty"
+    },
+    "S27": {
+      "status": "empty"
+    },
+    "S28": {
+      "status": "empty"
+    },
+    "T23": {
+      "status": "empty"
+    },
+    "T24": {
+      "status": "empty"
+    },
+    "T25": {
+      "status": "empty"
+    },
+    "T26": {
+      "status": "empty"
+    },
+    "T27": {
+      "status": "empty"
+    },
+    "T28": {
+      "status": "empty"
+    },
+    "U25": {
+      "status": "empty"
+    },
+    "U26": {
+      "status": "empty"
+    },
+    "U27": {
+      "status": "empty"
+    },
+    "U28": {
+      "status": "empty"
+    },
+    "V27": {
+      "status": "empty"
+    },
+    "V28": {
+      "status": "empty"
+    },
+    "V29": {
+      "status": "empty"
+    },
+    "V30": {
+      "status": "empty"
+    },
+    "W28": {
+      "status": "empty"
+    },
+    "W29": {
+      "status": "empty"
+    },
+    "W30": {
+      "status": "empty"
+    },
+    "X30": {
+      "status": "empty"
+    },
+    "Y30": {
+      "status": "empty"
+    },
+    "Z30": {
+      "status": "empty"
+    },
+    "Z31": {
+      "status": "empty"
+    },
+    "Z32": {
+      "status": "empty"
+    }
   },
   "groups": {
     "G1": {
@@ -155,7 +1772,12 @@
       "count": 174,
       "lat": 56.17861,
       "lng": 13.01625,
-      "mergedFrom": [10, 77, 40, 47],
+      "mergedFrom": [
+        10,
+        77,
+        40,
+        47
+      ],
       "session": "2026-04-03"
     },
     "G2": {
@@ -198,7 +1820,10 @@
       "count": 183,
       "lat": 56.10047,
       "lng": 12.86451,
-      "mergedFrom": [42, 141],
+      "mergedFrom": [
+        42,
+        141
+      ],
       "session": "2026-04-03"
     },
     "G8": {
@@ -268,20 +1893,76 @@
       "session": "2026-04-03",
       "note": "Inventering av råkbon 3 april 2026. Enbart Åstorps kommun. Punkt 9 korrigerad från 56.10521,12.88395 till 56.10173,12.87385 (utanför kommunen). Punkter 10+11 (42+141) sammanslagna till 183 bon (Kvidinge-Kyrka).",
       "points": [
-        { "lat": 56.17965, "lng": 13.01576, "count": 10 },
-        { "lat": 56.17986, "lng": 13.01659, "count": 77 },
-        { "lat": 56.17709, "lng": 13.01709, "count": 40 },
-        { "lat": 56.17785, "lng": 13.01556, "count": 47 },
-        { "lat": 56.1648, "lng": 12.97951, "count": 12 },
-        { "lat": 56.16219, "lng": 12.97525, "count": 7 },
-        { "lat": 56.1447, "lng": 12.94217, "count": 26 },
-        { "lat": 56.13696, "lng": 12.93258, "count": 31 },
-        { "lat": 56.10173, "lng": 12.87385, "count": 16 },
-        { "lat": 56.10023, "lng": 12.86581, "count": 42 },
-        { "lat": 56.10071, "lng": 12.8632, "count": 141 },
-        { "lat": 56.1023, "lng": 12.86229, "count": 15 },
-        { "lat": 56.1045, "lng": 12.86973, "count": 3 },
-        { "lat": 56.10402, "lng": 12.87812, "count": 13 }
+        {
+          "lat": 56.17965,
+          "lng": 13.01576,
+          "count": 10
+        },
+        {
+          "lat": 56.17986,
+          "lng": 13.01659,
+          "count": 77
+        },
+        {
+          "lat": 56.17709,
+          "lng": 13.01709,
+          "count": 40
+        },
+        {
+          "lat": 56.17785,
+          "lng": 13.01556,
+          "count": 47
+        },
+        {
+          "lat": 56.1648,
+          "lng": 12.97951,
+          "count": 12
+        },
+        {
+          "lat": 56.16219,
+          "lng": 12.97525,
+          "count": 7
+        },
+        {
+          "lat": 56.1447,
+          "lng": 12.94217,
+          "count": 26
+        },
+        {
+          "lat": 56.13696,
+          "lng": 12.93258,
+          "count": 31
+        },
+        {
+          "lat": 56.10173,
+          "lng": 12.87385,
+          "count": 16
+        },
+        {
+          "lat": 56.10023,
+          "lng": 12.86581,
+          "count": 42
+        },
+        {
+          "lat": 56.10071,
+          "lng": 12.8632,
+          "count": 141
+        },
+        {
+          "lat": 56.1023,
+          "lng": 12.86229,
+          "count": 15
+        },
+        {
+          "lat": 56.1045,
+          "lng": 12.86973,
+          "count": 3
+        },
+        {
+          "lat": 56.10402,
+          "lng": 12.87812,
+          "count": 13
+        }
       ],
       "total_nests": 480,
       "total_points": 14,
@@ -290,9 +1971,10 @@
     },
     {
       "session": "2026-04-10",
-      "note": "Inventering av råkbon 10 april 2026. Centrala/sydvästra området. 8 kluster identifierade: K19 (1), K24 (24), L23 (5), N20 (61), O22+P22 (49), S24 (19), P26+P27 (24), S29+T29+U29 (30).",
+      "note": "Inventering av råkbon 10 april 2026. Centrala/sydvästra området. 8 kluster identifierade: K19 (1), K24 (24), L23 (5), N20 (61), O22+P22 (49), S24 (19), P26+P27 (24), S29+T29+U29 (30). Tomma rutor markerade i admin: 426 nya.",
       "total_nests": 213,
-      "total_clusters": 8
+      "total_clusters": 8,
+      "empty_grids_added": 426
     }
   ]
 }

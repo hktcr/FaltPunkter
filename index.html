@@ -81,6 +81,8 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 .acc-tag.poor .val{color:var(--red)}
 .astorp-badge{font-size:.7rem;font-weight:800;color:#fff;background:var(--accent);padding:6px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:.05em}
 .astorp-badge.out{background:rgba(255,255,255,.05);color:var(--text-dim)}
+.ruta-badge{font-size:.7rem;font-weight:800;color:#fff;background:rgba(168,85,247,.8);padding:6px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:.05em;border:1px solid rgba(168,85,247,.4);display:flex;align-items:center;gap:4px}
+.ruta-badge.out{background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid transparent;display:flex;align-items:center;gap:4px}
 
 .coords-block{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;gap:12px}
 .coords-left{flex:1;display:flex;flex-direction:column;gap:6px}
@@ -212,6 +214,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
       <div class="source-spacer"></div>
       <div class="overlay-pills">
         <button class="overlay-pill" id="btnGrid" onclick="toggleGrid()">▦ Rutnät</button>
+        <button class="overlay-pill" id="btnCurrentRuta" onclick="toggleCurrentRuta()">▢ Ruta</button>
         <button class="overlay-pill rook-pill" id="btnRook" onclick="toggleRookOverlay()">🐦 Råkor</button>
       </div>
     </div>
@@ -223,6 +226,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
     </div>
     <div class="coord-source" style="margin-bottom:0;padding-top:0">
       <div class="astorp-badge" id="astorpBadge" style="display:none">📍 ÅSTORP</div>
+      <div class="ruta-badge" id="rutaBadge" style="display:none">▢ <span id="rutaVal">-</span></div>
       <div class="acc-tag" id="accTag" style="display:none">±<span class="val" id="accVal">?</span>m</div>
     </div>
     
@@ -297,6 +301,8 @@ let gpsAcc = null;
 let tapPos = null;
 let points = [];
 let sortBy = 'time'; // 'time' | 'dist'
+let currentRutaVisible = false;
+let currentRutaCache = { id: null, lat: null, lng: null };
 
 // MAP
 const map = L.map('map', { zoomControl: false, attributionControl: false }).setView(DEFAULT_CENTER, 14);
@@ -390,7 +396,8 @@ function updateDisplay() {
 
   const astBadge = document.getElementById('astorpBadge');
   if(astBadge) {
-    if (isPointInAstorp(lat, lng)) {
+    const inAstorp = isPointInAstorp(lat, lng);
+    if (inAstorp) {
       astBadge.style.display = '';
       astBadge.className = 'astorp-badge';
       astBadge.textContent = '📍 Åstorp';
@@ -399,6 +406,24 @@ function updateDisplay() {
       astBadge.className = 'astorp-badge out';
       astBadge.textContent = 'Utanför';
     }
+  }
+
+  if (currentRutaVisible) {
+    const rutaId = getCurrentRuta(lat, lng);
+    const rutaBadge = document.getElementById('rutaBadge');
+    if (rutaBadge) {
+      rutaBadge.style.display = '';
+      if (rutaId) {
+        document.getElementById('rutaVal').textContent = rutaId;
+        rutaBadge.className = 'ruta-badge';
+      } else {
+        document.getElementById('rutaVal').textContent = '-';
+        rutaBadge.className = 'ruta-badge out';
+      }
+    }
+  } else {
+    const rutaBadge = document.getElementById('rutaBadge');
+    if (rutaBadge) rutaBadge.style.display = 'none';
   }
 }
 
@@ -689,6 +714,57 @@ async function tryFetch(urls) {
     } catch (e) { /* try next */ }
   }
   return null;
+}
+
+function getCurrentRuta(lat, lng) {
+  if (!gridData || typeof turf === 'undefined') return null;
+  // fast path
+  if (currentRutaCache.id && currentRutaCache.lat !== null) {
+     const d = haversine(currentRutaCache.lat, currentRutaCache.lng, lat, lng);
+     if (d < 10) return currentRutaCache.id;
+  }
+  
+  const pt = turf.point([lng, lat]);
+  if (currentRutaCache.id) {
+     const prevFeat = gridData.features.find(f => f.properties.gridId === currentRutaCache.id);
+     if (prevFeat && turf.booleanPointInPolygon(pt, prevFeat)) {
+         currentRutaCache.lat = lat;
+         currentRutaCache.lng = lng;
+         return currentRutaCache.id;
+     }
+  }
+
+  for (let i = 0; i < gridData.features.length; i++) {
+    const f = gridData.features[i];
+    if (turf.booleanPointInPolygon(pt, f)) {
+      currentRutaCache.id = f.properties.gridId;
+      currentRutaCache.lat = lat;
+      currentRutaCache.lng = lng;
+      return currentRutaCache.id;
+    }
+  }
+  
+  currentRutaCache.id = null;
+  return null;
+}
+
+async function toggleCurrentRuta() {
+  const btn = document.getElementById('btnCurrentRuta');
+  if (currentRutaVisible) {
+    currentRutaVisible = false;
+    btn.classList.remove('active');
+    updateDisplay();
+    return;
+  }
+  
+  btn.textContent = '⏳';
+  const data = await loadGridData();
+  if (!data) { btn.textContent = '▢ Ruta'; return; }
+  
+  currentRutaVisible = true;
+  btn.classList.add('active');
+  btn.textContent = '▢ Ruta';
+  updateDisplay();
 }
 
 async function loadGridData() {

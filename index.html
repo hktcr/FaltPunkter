@@ -433,6 +433,17 @@ function updateDisplay() {
     const rutaBadge = document.getElementById('rutaBadge');
     if (rutaBadge) rutaBadge.style.display = 'none';
   }
+
+  if (typeof gridLayer !== 'undefined' && gridLayer && typeof gridLayer.eachLayer === 'function') {
+    gridLayer.eachLayer(layer => {
+      gridLayer.resetStyle(layer);
+      if (layer.feature && layer.feature.properties.gridId === selectedRutaId) {
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront();
+        }
+      }
+    });
+  }
 }
 
 function isPointInAstorp(lat, lng) {
@@ -443,6 +454,7 @@ function isPointInAstorp(lat, lng) {
   } catch (e) { return false; }
 }
 
+map.on('dragstart', () => { if (source === 'gps') setSource('center'); });
 map.on('move', () => { if (source === 'center') updateDisplay(); });
 
 map.on('click', function(e) {
@@ -870,9 +882,12 @@ function renderGrid() {
   
   gridLayer = L.geoJSON(gridData, {
     style: function(feature) {
+      const id = feature.properties.gridId;
+      const isSelected = (id === selectedRutaId);
       return {
-        color: 'rgba(168, 85, 247, 0.5)',
-        weight: 1,
+        color: isSelected ? '#3b82f6' : 'rgba(168, 85, 247, 0.5)',
+        weight: isSelected ? 3 : 1,
+        dashArray: isSelected ? '6,6' : null,
         fillColor: 'rgba(168, 85, 247, 0.06)',
         fillOpacity: 1,
         interactive: true
@@ -934,40 +949,37 @@ function renderRookOverlay() {
   gridLayer = L.geoJSON(gridData, {
     style: function(feature) {
       const id = feature.properties.gridId;
+      const isSelected = (id === selectedRutaId);
       const info = rookData.grids ? rookData.grids[id] : null;
       
+      let baseColor, baseWeight = 1, baseFill, baseOpac = 1;
+      
       if (info && info.status === 'nest') {
-        return {
-          color: 'rgba(16, 185, 129, 0.8)',
-          weight: 2,
-          fillColor: 'rgba(16, 185, 129, 0.35)',
-          fillOpacity: 1
-        };
+        baseColor = 'rgba(16, 185, 129, 0.8)';
+        baseWeight = 2;
+        baseFill = 'rgba(16, 185, 129, 0.35)';
       } else if (info && info.status === 'recheck') {
-        // Behöver kollas igen — orange
-        return {
-          color: 'rgba(245, 158, 11, 0.8)',
-          weight: 2,
-          fillColor: 'rgba(245, 158, 11, 0.3)',
-          fillOpacity: 1
-        };
+        baseColor = 'rgba(245, 158, 11, 0.8)';
+        baseWeight = 2;
+        baseFill = 'rgba(245, 158, 11, 0.3)';
       } else if (info && info.status === 'empty') {
-        // Inventerad utan bon — "försvinner" visuellt
-        return {
-          color: 'rgba(148, 163, 184, 0.15)',
-          weight: 0.5,
-          fillColor: 'transparent',
-          fillOpacity: 0
-        };
+        baseColor = 'rgba(148, 163, 184, 0.15)';
+        baseWeight = 0.5;
+        baseFill = 'transparent';
+        baseOpac = 0;
       } else {
-        // Not inventoried — gul
-        return {
-          color: 'rgba(250, 204, 21, 0.5)',
-          weight: 1,
-          fillColor: 'rgba(250, 204, 21, 0.15)',
-          fillOpacity: 1
-        };
+        baseColor = 'rgba(250, 204, 21, 0.5)';
+        baseFill = 'rgba(250, 204, 21, 0.15)';
       }
+
+      return {
+        color: isSelected ? '#3b82f6' : baseColor,
+        weight: isSelected ? 3 : baseWeight,
+        dashArray: isSelected ? '6,6' : null,
+        fillColor: baseFill,
+        fillOpacity: baseOpac,
+        interactive: true
+      };
     },
     onEachFeature: function(feature, layer) {
       layer.on('click', function(e) {

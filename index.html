@@ -433,17 +433,6 @@ function updateDisplay() {
     const rutaBadge = document.getElementById('rutaBadge');
     if (rutaBadge) rutaBadge.style.display = 'none';
   }
-
-  if (typeof gridLayer !== 'undefined' && gridLayer && typeof gridLayer.eachLayer === 'function') {
-    gridLayer.eachLayer(layer => {
-      gridLayer.resetStyle(layer);
-      if (layer.feature && layer.feature.properties.gridId === selectedRutaId) {
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-          layer.bringToFront();
-        }
-      }
-    });
-  }
 }
 
 function isPointInAstorp(lat, lng) {
@@ -907,6 +896,7 @@ function renderGrid() {
           if (!currentRutaVisible) toggleCurrentRuta();
         }
         updateDisplay();
+        refreshGridStyles();
       });
     }
   }).addTo(map);
@@ -995,6 +985,7 @@ function renderRookOverlay() {
           if (!currentRutaVisible) toggleCurrentRuta();
         }
         updateDisplay();
+        refreshGridStyles();
       });
     }
   }).addTo(map);

@@ -305,6 +305,7 @@ let sortBy = 'time'; // 'time' | 'dist'
 let currentRutaVisible = false;
 let currentRutaCache = { id: null, lat: null, lng: null };
 let selectedRutaId = null;
+let waitingForGPSCenter = false;
 
 // MAP
 const map = L.map('map', { zoomControl: false, attributionControl: false }).setView(DEFAULT_CENTER, 14);
@@ -495,6 +496,11 @@ function toggleGPS() {
     gpsPos = [pos.coords.latitude, pos.coords.longitude];
     gpsAcc = pos.coords.accuracy;
 
+    if (waitingForGPSCenter) {
+      map.setView(gpsPos, Math.max(map.getZoom(), 17));
+      waitingForGPSCenter = false;
+    }
+
     if (gpsMarker) map.removeLayer(gpsMarker);
     gpsMarker = L.circleMarker(gpsPos, {
       radius: 7, color: '#fff', fillColor: '#2ee8c8', fillOpacity: 1, weight: 2.5
@@ -525,8 +531,14 @@ function toggleGPS() {
 }
 
 function centerOnGPS() {
-  if (gpsPos) { map.setView(gpsPos, Math.max(map.getZoom(), 17)); } 
-  else { if (!gpsOn) toggleGPS(); toast('Söker GPS...'); }
+  if (gpsPos) { 
+    map.setView(gpsPos, Math.max(map.getZoom(), 17)); 
+    waitingForGPSCenter = false;
+  } else { 
+    if (!gpsOn) toggleGPS(); 
+    toast('Söker GPS...'); 
+    waitingForGPSCenter = true;
+  }
 }
 
 // HAVERSINE DISTANCE
@@ -870,8 +882,10 @@ function renderGrid() {
       layer.on('click', function(e) {
         L.DomEvent.stopPropagation(e);
         const id = feature.properties.gridId;
+        const currentCoords = getCurrentCoords();
+        const currentId = getCurrentRuta(currentCoords[0], currentCoords[1]);
         
-        if (selectedRutaId === id) {
+        if (id === currentId || selectedRutaId === id) {
           selectedRutaId = null;
         } else {
           selectedRutaId = id;
@@ -959,8 +973,10 @@ function renderRookOverlay() {
       layer.on('click', function(e) {
         L.DomEvent.stopPropagation(e);
         const id = feature.properties.gridId;
+        const currentCoords = getCurrentCoords();
+        const currentId = getCurrentRuta(currentCoords[0], currentCoords[1]);
         
-        if (selectedRutaId === id) {
+        if (id === currentId || selectedRutaId === id) {
           selectedRutaId = null;
         } else {
           selectedRutaId = id;

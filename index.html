@@ -81,8 +81,10 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 .acc-tag.poor .val{color:var(--red)}
 .astorp-badge{font-size:.7rem;font-weight:800;color:#fff;background:var(--accent);padding:6px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:.05em}
 .astorp-badge.out{background:rgba(255,255,255,.05);color:var(--text-dim)}
-.ruta-badge{font-size:.7rem;font-weight:800;color:#fff;background:rgba(168,85,247,.8);padding:6px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:.05em;border:1px solid rgba(168,85,247,.4);display:flex;align-items:center;gap:4px}
-.ruta-badge.out{background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid transparent;display:flex;align-items:center;gap:4px}
+.ruta-badge{font-size:.75rem;font-weight:800;color:#fff;background:rgba(168,85,247,.8);padding:6px 12px;border-radius:12px;text-transform:uppercase;letter-spacing:.05em;border:1px solid rgba(168,85,247,.4);display:flex;align-items:center;gap:6px}
+.ruta-badge.out{background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid transparent;display:flex;align-items:center;gap:6px}
+.ruta-badge.selected{background:var(--surface2);color:var(--text-bright);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;gap:6px}
+.ruta-badge #rutaVal{font-size:1.1rem;font-family:var(--mono)}
 
 .coords-block{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;gap:12px}
 .coords-left{flex:1;display:flex;flex-direction:column;gap:6px}
@@ -302,6 +304,7 @@ let points = [];
 let sortBy = 'time'; // 'time' | 'dist'
 let currentRutaVisible = false;
 let currentRutaCache = { id: null, lat: null, lng: null };
+let selectedRutaId = null;
 
 // MAP
 const map = L.map('map', { zoomControl: false, attributionControl: false }).setView(DEFAULT_CENTER, 14);
@@ -408,13 +411,18 @@ function updateDisplay() {
   }
 
   if (currentRutaVisible) {
-    const rutaId = getCurrentRuta(lat, lng);
+    const currentId = getCurrentRuta(lat, lng);
+    const displayId = selectedRutaId || currentId;
     const rutaBadge = document.getElementById('rutaBadge');
     if (rutaBadge) {
       rutaBadge.style.display = '';
-      if (rutaId) {
-        document.getElementById('rutaVal').textContent = rutaId;
-        rutaBadge.className = 'ruta-badge';
+      if (displayId) {
+        document.getElementById('rutaVal').textContent = displayId;
+        if (selectedRutaId) {
+          rutaBadge.className = 'ruta-badge selected';
+        } else {
+          rutaBadge.className = 'ruta-badge';
+        }
       } else {
         document.getElementById('rutaVal').textContent = '-';
         rutaBadge.className = 'ruta-badge out';
@@ -437,6 +445,10 @@ function isPointInAstorp(lat, lng) {
 map.on('move', () => { if (source === 'center') updateDisplay(); });
 
 map.on('click', function(e) {
+  if (selectedRutaId) {
+    selectedRutaId = null;
+    updateDisplay();
+  }
   tapPos = [e.latlng.lat, e.latlng.lng];
   if (tapMarker) map.removeLayer(tapMarker);
   tapMarker = L.circleMarker(e.latlng, {
@@ -858,32 +870,14 @@ function renderGrid() {
       layer.on('click', function(e) {
         L.DomEvent.stopPropagation(e);
         const id = feature.properties.gridId;
-        const center = gridCentroids[id] || [0,0];
-        let html = `<div class="grid-popup">`;
-        html += `<div class="gp-id">${id}</div>`;
-        html += `<div class="gp-coord">${center[0].toFixed(5)}, ${center[1].toFixed(5)}</div>`;
         
-        // Add rook status if available
-        if (rookData && rookData.grids && rookData.grids[id]) {
-          const info = rookData.grids[id];
-          if (info.status === 'nest') {
-            html += `<div class="gp-status nest">● Bon</div>`;
-            if (info.group && rookData.groups[info.group]) {
-              const g = rookData.groups[info.group];
-              html += `<div class="gp-group">${info.group}: ${g.count} bon</div>`;
-            }
-          } else if (info.status === 'recheck') {
-            html += `<div class="gp-status recheck">⚠ Behöver kollas igen</div>`;
-          } else if (info.status === 'empty') {
-            html += `<div class="gp-status empty">○ Inventerad – inga bon</div>`;
-          }
+        if (selectedRutaId === id) {
+          selectedRutaId = null;
+        } else {
+          selectedRutaId = id;
+          if (!currentRutaVisible) toggleCurrentRuta();
         }
-        html += `</div>`;
-        
-        L.popup({ closeButton: true, className: '' })
-          .setLatLng(e.latlng)
-          .setContent(html)
-          .openOn(map);
+        updateDisplay();
       });
     }
   }).addTo(map);
@@ -965,33 +959,14 @@ function renderRookOverlay() {
       layer.on('click', function(e) {
         L.DomEvent.stopPropagation(e);
         const id = feature.properties.gridId;
-        const center = gridCentroids[id] || [0,0];
-        let html = `<div class="grid-popup">`;
-        html += `<div class="gp-id">${id}</div>`;
-        html += `<div class="gp-coord">${center[0].toFixed(5)}, ${center[1].toFixed(5)}</div>`;
         
-        if (rookData.grids && rookData.grids[id]) {
-          const info = rookData.grids[id];
-          if (info.status === 'nest') {
-            html += `<div class="gp-status nest">● Bon</div>`;
-            if (info.group && rookData.groups[info.group]) {
-              const g = rookData.groups[info.group];
-              html += `<div class="gp-group">${info.group}: ${g.count} bon</div>`;
-            }
-          } else if (info.status === 'recheck') {
-            html += `<div class="gp-status recheck">⚠ Behöver kollas igen</div>`;
-          } else {
-            html += `<div class="gp-status empty">○ Inventerad – inga bon</div>`;
-          }
+        if (selectedRutaId === id) {
+          selectedRutaId = null;
         } else {
-          html += `<div class="gp-status" style="color:#facc15">◌ Ej inventerad</div>`;
+          selectedRutaId = id;
+          if (!currentRutaVisible) toggleCurrentRuta();
         }
-        html += `</div>`;
-        
-        L.popup({ closeButton: true })
-          .setLatLng(e.latlng)
-          .setContent(html)
-          .openOn(map);
+        updateDisplay();
       });
     }
   }).addTo(map);

@@ -377,7 +377,7 @@ function getCurrentCoords() {
   return [c.lat, c.lng];
 }
 
-function updateDisplay() {
+function updateCrosshairCoords() {
   let lat, lng, warn = false;
   if (source === 'gps') {
     if (gpsPos) { lat = gpsPos[0]; lng = gpsPos[1]; warn = gpsAcc > 30; }
@@ -396,6 +396,20 @@ function updateDisplay() {
   document.getElementById('latDigits').innerHTML = `<span class="int">${la.int}</span><span class="dot">.</span><span class="dec">${la.dec}</span>`;
   document.getElementById('lngDigits').className = 'c-digits' + warnClass;
   document.getElementById('lngDigits').innerHTML = `<span class="int">${lo.int}</span><span class="dot">.</span><span class="dec">${lo.dec}</span>`;
+}
+
+function updateContextBadges() {
+  let lat, lng;
+  if (source === 'gps') {
+    if (gpsPos) { lat = gpsPos[0]; lng = gpsPos[1]; }
+    else { lat = 0; lng = 0; }
+  } else if (source === 'tap') {
+    if (tapPos) { lat = tapPos[0]; lng = tapPos[1]; }
+    else { const c = map.getCenter(); lat = c.lat; lng = c.lng; }
+  } else {
+    const c = map.getCenter();
+    lat = c.lat; lng = c.lng;
+  }
 
   const astBadge = document.getElementById('astorpBadge');
   if(astBadge) {
@@ -435,6 +449,11 @@ function updateDisplay() {
   }
 }
 
+function updateDisplay() {
+  updateCrosshairCoords();
+  updateContextBadges();
+}
+
 function isPointInAstorp(lat, lng) {
   if (!astorpBoundary || typeof turf === 'undefined') return false;
   try {
@@ -444,7 +463,8 @@ function isPointInAstorp(lat, lng) {
 }
 
 map.on('dragstart', () => { if (source === 'gps') setSource('center'); });
-map.on('move', () => { if (source === 'center') updateDisplay(); });
+map.on('move', () => { if (source === 'center') updateCrosshairCoords(); });
+map.on('moveend', () => { if (source === 'center') updateContextBadges(); });
 
 map.on('click', function(e) {
   if (selectedRutaId) {

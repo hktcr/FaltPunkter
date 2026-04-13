@@ -2345,6 +2345,66 @@
     },
     "BP24": {
       "status": "empty"
+    },
+    "AC28": {
+      "status": "nest",
+      "group": "G22"
+    },
+    "AB28": {
+      "status": "nest",
+      "group": "G23"
+    },
+    "AA25": {
+      "status": "nest",
+      "group": "G24"
+    },
+    "Z27": {
+      "status": "nest",
+      "group": "G25"
+    },
+    "Y26": {
+      "status": "nest",
+      "group": "G26"
+    },
+    "Y27": {
+      "status": "nest",
+      "group": "G27"
+    },
+    "Y23": {
+      "status": "nest",
+      "group": "G28"
+    },
+    "AB29": {
+      "status": "nest",
+      "group": "G29"
+    },
+    "AD29": {
+      "status": "nest",
+      "group": "G30"
+    },
+    "AD28": {
+      "status": "nest",
+      "group": "G31"
+    },
+    "AG28": {
+      "status": "nest",
+      "group": "G32"
+    },
+    "AF27": {
+      "status": "nest",
+      "group": "G33"
+    },
+    "AG26": {
+      "status": "nest",
+      "group": "G34"
+    },
+    "AI26": {
+      "status": "nest",
+      "group": "G35"
+    },
+    "AI27": {
+      "status": "nest",
+      "group": "G36"
     }
   },
   "groups": {
@@ -2480,6 +2540,82 @@
     "G21": {
       "count": 18,
       "date": "2026-04-10"
+    },
+    "G22": {
+      "label": "AC28",
+      "count": 3,
+      "session": "2026-04-13"
+    },
+    "G23": {
+      "label": "AB28",
+      "count": 24,
+      "session": "2026-04-13"
+    },
+    "G24": {
+      "label": "AA25",
+      "count": 24,
+      "session": "2026-04-13"
+    },
+    "G25": {
+      "label": "Z27",
+      "count": 16,
+      "session": "2026-04-13"
+    },
+    "G26": {
+      "label": "Y26",
+      "count": 25,
+      "session": "2026-04-13"
+    },
+    "G27": {
+      "label": "Y27",
+      "count": 1,
+      "session": "2026-04-13"
+    },
+    "G28": {
+      "label": "Y23",
+      "count": 20,
+      "session": "2026-04-13",
+      "note": "SVÅRINVENTERAD PGA AV BON LÅGT I MYCKET TÄT VÄXTLIGHET/TRÄD"
+    },
+    "G29": {
+      "label": "AB29",
+      "count": 3,
+      "session": "2026-04-13"
+    },
+    "G30": {
+      "label": "AD29",
+      "count": 41,
+      "session": "2026-04-13"
+    },
+    "G31": {
+      "label": "AD28",
+      "count": 10,
+      "session": "2026-04-13"
+    },
+    "G32": {
+      "label": "AG28",
+      "count": 88,
+      "session": "2026-04-13"
+    },
+    "G33": {
+      "label": "AF27",
+      "count": 4,
+      "session": "2026-04-13"
+    },
+    "G34": {
+      "label": "AG26",
+      "count": 3,
+      "session": "2026-04-13"
+    },
+    "G35": {
+      "label": "AI26",
+      "count": 20,
+      "session": "2026-04-13"
+    },
+    "G36": {
+      "label": "AI27",
+      "count": 12,
+      "session": "2026-04-13"
     }
   },
   "fieldnotes": [

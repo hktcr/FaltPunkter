@@ -342,7 +342,7 @@ const map = L.map('map', { zoomControl: false, attributionControl: false }).setV
 
 const tiles = {
   street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }),
-  topowebb: L.tileLayer('https://maps.lantmateriet.se/open/topowebb-ccby/v1/wmts/1.0.0/topowebb/default/3857/{z}/{y}/{x}.png', { 
+  topowebb: L.tileLayer('https://minkarta.lantmateriet.se/map/topowebbcache/?layer=topowebb&style=default&tilematrixset=3857&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix={z}&TileCol={x}&TileRow={y}', { 
     maxZoom: 15, 
     attribution: '&copy; <a href="https://www.lantmateriet.se/en/">Lantmäteriet</a>' 
   }),

@@ -84,7 +84,8 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 .ruta-badge{font-size:.75rem;font-weight:800;color:#fff;background:rgba(168,85,247,.8);padding:6px 12px;border-radius:12px;text-transform:uppercase;letter-spacing:.05em;border:1px solid rgba(168,85,247,.4);display:flex;align-items:center;gap:6px}
 .ruta-badge.out{background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid transparent;display:flex;align-items:center;gap:6px}
 .ruta-badge.selected{background:var(--surface2);color:var(--text-bright);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;gap:6px}
-.ruta-badge #rutaVal{font-size:1.1rem;font-family:var(--mono)}
+.ruta-badge.gps{background:rgba(56,189,248,.15);color:var(--cyan);border:1px solid rgba(56,189,248,.4);margin-left:2px}
+.ruta-badge #rutaVal, .ruta-badge #gpsRutaVal{font-size:1.1rem;font-family:var(--mono)}
 
 .coords-block{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;gap:12px}
 .coords-left{flex:1;display:flex;flex-direction:column;gap:6px}
@@ -258,6 +259,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
     <div class="coord-source" style="margin-bottom:0;padding-top:0">
       <div class="astorp-badge" id="astorpBadge" style="display:none">📍 ÅSTORP</div>
       <div class="ruta-badge" id="rutaBadge" style="display:none">▢ <span id="rutaVal">-</span></div>
+      <div class="ruta-badge gps" id="gpsRutaBadge" style="display:none">📡 ▢ <span id="gpsRutaVal">-</span></div>
       <div class="acc-tag" id="accTag" style="display:none">±<span class="val" id="accVal">?</span>m</div>
     </div>
     
@@ -477,9 +479,30 @@ function updateContextBadges() {
         rutaBadge.className = 'ruta-badge out';
       }
     }
+    
+    // Ytterligare badge för GPS-rutan om vi inte redan tittar på GPS-källan
+    const gpsRutaBadge = document.getElementById('gpsRutaBadge');
+    if (gpsOn && source !== 'gps') {
+      const gLat = gpsPos ? gpsPos[0] : 0;
+      const gLng = gpsPos ? gpsPos[1] : 0;
+      const gId = getCurrentRuta(gLat, gLng);
+      if (gId) {
+        if (gpsRutaBadge) {
+          gpsRutaBadge.style.display = '';
+          document.getElementById('gpsRutaVal').textContent = gId;
+        }
+      } else {
+        if (gpsRutaBadge) gpsRutaBadge.style.display = 'none';
+      }
+    } else {
+      if (gpsRutaBadge) gpsRutaBadge.style.display = 'none';
+    }
+
   } else {
     const rutaBadge = document.getElementById('rutaBadge');
     if (rutaBadge) rutaBadge.style.display = 'none';
+    const gpsRutaBadge = document.getElementById('gpsRutaBadge');
+    if (gpsRutaBadge) gpsRutaBadge.style.display = 'none';
   }
 }
 

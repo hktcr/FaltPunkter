@@ -187,6 +187,35 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
   .zoom-btn{width:38px;height:38px;font-size:1.1rem}
   .kpi-val-ov{font-size:.85rem}
 }
+
+/* Pulsating GPS Marker */
+.gps-pulse-wrapper { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; }
+.gps-pulse-inner { 
+  width: 12px; height: 12px; 
+  background: var(--accent); 
+  border: 2px solid #fff; 
+  border-radius: 50%; 
+  box-shadow: 0 0 8px rgba(0,0,0,0.5); 
+  z-index: 2; 
+  animation: gps-color-pulse 2s infinite ease-in-out; 
+}
+.gps-pulse-ring { 
+  position: absolute; 
+  width: 12px; height: 12px; 
+  border: 3px solid var(--accent); 
+  border-radius: 50%; 
+  z-index: 1; 
+  animation: gps-ring-pulse 2s infinite ease-out; 
+  pointer-events: none; 
+}
+@keyframes gps-ring-pulse { 
+  0% { transform: scale(1); opacity: 0.8; } 
+  100% { transform: scale(4); opacity: 0; } 
+}
+@keyframes gps-color-pulse { 
+  0%, 100% { background-color: #1d4ed8; } /* djupblå */
+  50% { background-color: #60a5fa; }    /* ljusblå */
+}
 </style>
 </head>
 <body>
@@ -198,6 +227,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
   <div class="right-controls">
     <div class="layers">
       <button class="layer-pill active" data-layer="street">Karta</button>
+      <button class="layer-pill" data-layer="topowebb">Grön</button>
       <button class="layer-pill" data-layer="terrain">Terr</button>
       <button class="layer-pill" data-layer="satellite">Sat</button>
     </div>
@@ -312,6 +342,10 @@ const map = L.map('map', { zoomControl: false, attributionControl: false }).setV
 
 const tiles = {
   street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }),
+  topowebb: L.tileLayer('https://maps.lantmateriet.se/open/topowebb-ccby/v1/wmts/1.0.0/topowebb/default/3857/{z}/{y}/{x}.png', { 
+    maxZoom: 15, 
+    attribution: '&copy; <a href="https://www.lantmateriet.se/en/">Lantmäteriet</a>' 
+  }),
   terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 }),
   satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 })
 };
@@ -523,9 +557,13 @@ function toggleGPS() {
     }
 
     if (gpsMarker) map.removeLayer(gpsMarker);
-    gpsMarker = L.circleMarker(gpsPos, {
-      radius: 7, color: '#fff', fillColor: '#2ee8c8', fillOpacity: 1, weight: 2.5
-    }).addTo(map);
+    const pulseIcon = L.divIcon({
+      className: '',
+      html: '<div class="gps-pulse-wrapper"><div class="gps-pulse-ring"></div><div class="gps-pulse-inner"></div></div>',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+    gpsMarker = L.marker(gpsPos, { icon: pulseIcon }).addTo(map);
 
     if (gpsCircle) map.removeLayer(gpsCircle);
     gpsCircle = L.circle(gpsPos, {

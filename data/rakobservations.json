@@ -2894,6 +2894,278 @@
     },
     "Z28": {
       "status": "empty"
+    },
+    "AU28": {
+      "status": "nest",
+      "group": "G37"
+    },
+    "AT29": {
+      "status": "nest",
+      "group": "G38"
+    },
+    "AY28": {
+      "status": "nest",
+      "group": "G39"
+    },
+    "AY27": {
+      "status": "nest",
+      "group": "G40"
+    },
+    "BA27": {
+      "status": "nest",
+      "group": "G41"
+    },
+    "BB26": {
+      "status": "nest",
+      "group": "G42"
+    },
+    "BB27": {
+      "status": "nest",
+      "group": "G43"
+    },
+    "BC26": {
+      "status": "nest",
+      "group": "G44"
+    },
+    "BD26": {
+      "status": "nest",
+      "group": "G45"
+    },
+    "BC28": {
+      "status": "nest",
+      "group": "G46"
+    },
+    "BB28": {
+      "status": "nest",
+      "group": "G47"
+    },
+    "AQ28": {
+      "status": "empty"
+    },
+    "AQ29": {
+      "status": "empty"
+    },
+    "AQ30": {
+      "status": "empty"
+    },
+    "AR29": {
+      "status": "empty"
+    },
+    "AR30": {
+      "status": "empty"
+    },
+    "AS29": {
+      "status": "empty"
+    },
+    "AS30": {
+      "status": "empty"
+    },
+    "AT30": {
+      "status": "empty"
+    },
+    "AT31": {
+      "status": "empty"
+    },
+    "AT32": {
+      "status": "empty"
+    },
+    "AT33": {
+      "status": "empty"
+    },
+    "AT34": {
+      "status": "empty"
+    },
+    "AT35": {
+      "status": "empty"
+    },
+    "AU29": {
+      "status": "empty"
+    },
+    "AU30": {
+      "status": "empty"
+    },
+    "AU31": {
+      "status": "empty"
+    },
+    "AU32": {
+      "status": "empty"
+    },
+    "AU33": {
+      "status": "empty"
+    },
+    "AU34": {
+      "status": "empty"
+    },
+    "AU35": {
+      "status": "empty"
+    },
+    "AV28": {
+      "status": "empty"
+    },
+    "AV29": {
+      "status": "empty"
+    },
+    "AV30": {
+      "status": "empty"
+    },
+    "AV31": {
+      "status": "empty"
+    },
+    "AV32": {
+      "status": "empty"
+    },
+    "AW26": {
+      "status": "empty"
+    },
+    "AW27": {
+      "status": "empty"
+    },
+    "AW28": {
+      "status": "empty"
+    },
+    "AW29": {
+      "status": "empty"
+    },
+    "AW30": {
+      "status": "empty"
+    },
+    "AW31": {
+      "status": "empty"
+    },
+    "AW32": {
+      "status": "empty"
+    },
+    "AX26": {
+      "status": "empty"
+    },
+    "AX27": {
+      "status": "empty"
+    },
+    "AX28": {
+      "status": "empty"
+    },
+    "AX29": {
+      "status": "empty"
+    },
+    "AX30": {
+      "status": "empty"
+    },
+    "AX31": {
+      "status": "empty"
+    },
+    "AX32": {
+      "status": "empty"
+    },
+    "AY26": {
+      "status": "empty"
+    },
+    "AY29": {
+      "status": "empty"
+    },
+    "AY30": {
+      "status": "empty"
+    },
+    "AY31": {
+      "status": "empty"
+    },
+    "AZ26": {
+      "status": "empty"
+    },
+    "AZ27": {
+      "status": "empty"
+    },
+    "AZ28": {
+      "status": "empty"
+    },
+    "AZ29": {
+      "status": "empty"
+    },
+    "AZ30": {
+      "status": "empty"
+    },
+    "AZ31": {
+      "status": "empty"
+    },
+    "BA26": {
+      "status": "empty"
+    },
+    "BA28": {
+      "status": "empty"
+    },
+    "BA29": {
+      "status": "empty"
+    },
+    "BA30": {
+      "status": "empty"
+    },
+    "BA31": {
+      "status": "empty"
+    },
+    "BB29": {
+      "status": "empty"
+    },
+    "BB30": {
+      "status": "empty"
+    },
+    "BB31": {
+      "status": "empty"
+    },
+    "BC27": {
+      "status": "empty"
+    },
+    "BC29": {
+      "status": "empty"
+    },
+    "BC30": {
+      "status": "empty"
+    },
+    "BC31": {
+      "status": "empty"
+    },
+    "BD27": {
+      "status": "empty"
+    },
+    "BD28": {
+      "status": "empty"
+    },
+    "BD29": {
+      "status": "empty"
+    },
+    "BD30": {
+      "status": "empty"
+    },
+    "BE28": {
+      "status": "empty"
+    },
+    "BE29": {
+      "status": "empty"
+    },
+    "BE30": {
+      "status": "empty"
+    },
+    "BF30": {
+      "status": "empty"
+    },
+    "BG30": {
+      "status": "empty"
+    },
+    "BH27": {
+      "status": "empty"
+    },
+    "BH30": {
+      "status": "empty"
+    },
+    "BI27": {
+      "status": "empty"
+    },
+    "BI28": {
+      "status": "empty"
+    },
+    "BJ27": {
+      "status": "empty"
+    },
+    "BJ28": {
+      "status": "empty"
     }
   },
   "groups": {
@@ -3105,6 +3377,61 @@
       "label": "AI27",
       "count": 12,
       "session": "2026-04-13"
+    },
+    "G37": {
+      "label": "AU28",
+      "count": 9,
+      "session": "2026-04-15"
+    },
+    "G38": {
+      "label": "AT29",
+      "count": 63,
+      "session": "2026-04-15"
+    },
+    "G39": {
+      "label": "AY28",
+      "count": 26,
+      "session": "2026-04-15"
+    },
+    "G40": {
+      "label": "AY27",
+      "count": 5,
+      "session": "2026-04-15"
+    },
+    "G41": {
+      "label": "BA27",
+      "count": 39,
+      "session": "2026-04-15"
+    },
+    "G42": {
+      "label": "BB26",
+      "count": 3,
+      "session": "2026-04-15"
+    },
+    "G43": {
+      "label": "BB27",
+      "count": 55,
+      "session": "2026-04-15"
+    },
+    "G44": {
+      "label": "BC26",
+      "count": 15,
+      "session": "2026-04-15"
+    },
+    "G45": {
+      "label": "BD26",
+      "count": 7,
+      "session": "2026-04-15"
+    },
+    "G46": {
+      "label": "BC28",
+      "count": 3,
+      "session": "2026-04-15"
+    },
+    "G47": {
+      "label": "BB28",
+      "count": 57,
+      "session": "2026-04-15"
     }
   },
   "fieldnotes": [
@@ -3194,6 +3521,13 @@
       "total_nests": 245,
       "total_clusters": 9,
       "empty_grids_added": 426
+    },
+    {
+      "session": "2026-04-15",
+      "note": "Inventering av råkbon 2026-04-15. 11 rutor inrapporterade. Originaldata: Ruta AU28: 9 BON;AT29:63;AY28:7+19;AY27:5;BA27:36+3;BB26:3;BB27:19+8+28;BC26:15;BD26:7;BC28:3;BB28:23+10+18+6 Tillagda 76 tomma rutor markerade i admin.",
+      "total_nests": 282,
+      "total_clusters": 11,
+      "empty_grids_added": 76
     }
   ]
 }

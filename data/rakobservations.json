@@ -3166,11 +3166,368 @@
     },
     "BJ28": {
       "status": "empty"
+    },
+    "AK17": {
+      "status": "empty"
+    },
+    "AL17": {
+      "status": "empty"
+    },
+    "AL18": {
+      "status": "empty"
+    },
+    "AL27": {
+      "status": "empty"
+    },
+    "AM18": {
+      "status": "empty"
+    },
+    "AM19": {
+      "status": "empty"
+    },
+    "AM20": {
+      "status": "empty"
+    },
+    "AM27": {
+      "status": "empty"
+    },
+    "AN19": {
+      "status": "empty"
+    },
+    "AN20": {
+      "status": "empty"
+    },
+    "AN21": {
+      "status": "empty"
+    },
+    "AN27": {
+      "status": "empty"
+    },
+    "AO21": {
+      "status": "empty"
+    },
+    "AO22": {
+      "status": "empty"
+    },
+    "AO23": {
+      "status": "empty"
+    },
+    "AO24": {
+      "status": "empty"
+    },
+    "AO27": {
+      "status": "empty"
+    },
+    "AP21": {
+      "status": "empty"
+    },
+    "AP22": {
+      "status": "empty"
+    },
+    "AP23": {
+      "status": "empty"
+    },
+    "AP24": {
+      "status": "empty"
+    },
+    "AP25": {
+      "status": "empty"
+    },
+    "AP26": {
+      "status": "empty"
+    },
+    "AP27": {
+      "status": "empty"
+    },
+    "AQ24": {
+      "status": "empty"
+    },
+    "AQ25": {
+      "status": "empty"
+    },
+    "AQ26": {
+      "status": "empty"
+    },
+    "AQ27": {
+      "status": "empty"
+    },
+    "AR27": {
+      "status": "empty"
+    },
+    "AR28": {
+      "status": "empty"
+    },
+    "AS27": {
+      "status": "empty"
+    },
+    "AS28": {
+      "status": "empty"
+    },
+    "AT24": {
+      "status": "empty"
+    },
+    "AT25": {
+      "status": "empty"
+    },
+    "AT26": {
+      "status": "empty"
+    },
+    "AT27": {
+      "status": "empty"
+    },
+    "AT28": {
+      "status": "empty"
+    },
+    "AU24": {
+      "status": "empty"
+    },
+    "AU25": {
+      "status": "empty"
+    },
+    "AU26": {
+      "status": "empty"
+    },
+    "AU27": {
+      "status": "empty"
+    },
+    "AV24": {
+      "status": "empty"
+    },
+    "AV25": {
+      "status": "empty"
+    },
+    "AV26": {
+      "status": "empty"
+    },
+    "AV27": {
+      "status": "empty"
+    },
+    "AW24": {
+      "status": "empty"
+    },
+    "AW25": {
+      "status": "empty"
+    },
+    "AX23": {
+      "status": "empty"
+    },
+    "AX24": {
+      "status": "empty"
+    },
+    "AX25": {
+      "status": "empty"
+    },
+    "AY23": {
+      "status": "empty"
+    },
+    "AY24": {
+      "status": "empty"
+    },
+    "AY25": {
+      "status": "empty"
+    },
+    "AZ23": {
+      "status": "empty"
+    },
+    "AZ24": {
+      "status": "empty"
+    },
+    "AZ25": {
+      "status": "empty"
+    },
+    "BA23": {
+      "status": "empty"
+    },
+    "BA24": {
+      "status": "empty"
+    },
+    "BA25": {
+      "status": "empty"
+    },
+    "BB23": {
+      "status": "empty"
+    },
+    "BB24": {
+      "status": "empty"
+    },
+    "BB25": {
+      "status": "empty"
+    },
+    "BC17": {
+      "status": "empty"
+    },
+    "BC18": {
+      "status": "empty"
+    },
+    "BC19": {
+      "status": "empty"
+    },
+    "BC25": {
+      "status": "empty"
+    },
+    "BD16": {
+      "status": "empty"
+    },
+    "BD17": {
+      "status": "empty"
+    },
+    "BD18": {
+      "status": "empty"
+    },
+    "BE15": {
+      "status": "empty"
+    },
+    "BE16": {
+      "status": "empty"
+    },
+    "BE17": {
+      "status": "empty"
+    },
+    "BE18": {
+      "status": "empty"
+    },
+    "BH13": {
+      "status": "empty"
+    },
+    "BI14": {
+      "status": "empty"
+    },
+    "BJ14": {
+      "status": "empty"
+    },
+    "BJ15": {
+      "status": "empty"
+    },
+    "BJ16": {
+      "status": "empty"
+    },
+    "BK14": {
+      "status": "empty"
+    },
+    "BK15": {
+      "status": "empty"
+    },
+    "BK16": {
+      "status": "empty"
+    },
+    "BL14": {
+      "status": "empty"
+    },
+    "BL15": {
+      "status": "empty"
+    },
+    "BM6": {
+      "status": "empty"
+    },
+    "BM7": {
+      "status": "empty"
+    },
+    "BM8": {
+      "status": "empty"
+    },
+    "BM9": {
+      "status": "empty"
+    },
+    "BN10": {
+      "status": "empty"
+    },
+    "BN6": {
+      "status": "empty"
+    },
+    "BN7": {
+      "status": "empty"
+    },
+    "BN8": {
+      "status": "empty"
+    },
+    "BN9": {
+      "status": "empty"
+    },
+    "BO10": {
+      "status": "empty"
+    },
+    "BO11": {
+      "status": "empty"
+    },
+    "BP11": {
+      "status": "empty"
+    },
+    "H9": {
+      "status": "empty"
+    },
+    "I8": {
+      "status": "empty"
+    },
+    "I9": {
+      "status": "empty"
+    },
+    "J10": {
+      "status": "empty"
+    },
+    "J11": {
+      "status": "empty"
+    },
+    "J7": {
+      "status": "empty"
+    },
+    "J8": {
+      "status": "empty"
+    },
+    "J9": {
+      "status": "empty"
+    },
+    "K10": {
+      "status": "empty"
+    },
+    "K11": {
+      "status": "empty"
+    },
+    "K6": {
+      "status": "empty"
+    },
+    "K7": {
+      "status": "empty"
+    },
+    "K8": {
+      "status": "empty"
+    },
+    "K9": {
+      "status": "empty"
+    },
+    "L10": {
+      "status": "empty"
+    },
+    "L11": {
+      "status": "empty"
+    },
+    "L12": {
+      "status": "empty"
+    },
+    "V17": {
+      "status": "empty"
+    },
+    "V18": {
+      "status": "empty"
+    },
+    "V19": {
+      "status": "empty"
+    },
+    "W18": {
+      "status": "empty"
+    },
+    "W19": {
+      "status": "empty"
+    },
+    "X18": {
+      "status": "empty"
+    },
+    "X19": {
+      "status": "empty"
     }
   },
   "groups": {
     "G1": {
-      "label": "Rönnetorp",
+      "label": "R\u00f6nnetorp",
       "count": 174,
       "lat": 56.17861,
       "lng": 13.01625,
@@ -3197,7 +3554,7 @@
       "session": "2026-04-03"
     },
     "G4": {
-      "label": "Bälsåkra",
+      "label": "B\u00e4ls\u00e5kra",
       "count": 26,
       "lat": 56.1447,
       "lng": 12.94217,
@@ -3211,7 +3568,7 @@
       "session": "2026-04-03"
     },
     "G6": {
-      "label": "Kvidinge-Ö",
+      "label": "Kvidinge-\u00d6",
       "count": 16,
       "lat": 56.10173,
       "lng": 12.87385,
@@ -3243,7 +3600,7 @@
       "session": "2026-04-03"
     },
     "G10": {
-      "label": "Kvidinge-NÖ",
+      "label": "Kvidinge-N\u00d6",
       "count": 13,
       "lat": 56.10402,
       "lng": 12.87812,
@@ -3336,7 +3693,7 @@
       "label": "Y23",
       "count": 20,
       "session": "2026-04-13",
-      "note": "SVÅRINVENTERAD PGA AV BON LÅGT I MYCKET TÄT VÄXTLIGHET/TRÄD"
+      "note": "SV\u00c5RINVENTERAD PGA AV BON L\u00c5GT I MYCKET T\u00c4T V\u00c4XTLIGHET/TR\u00c4D"
     },
     "G29": {
       "label": "AB29",
@@ -3437,7 +3794,7 @@
   "fieldnotes": [
     {
       "session": "2026-04-03",
-      "note": "Inventering av råkbon 3 april 2026. Enbart Åstorps kommun. Punkt 9 korrigerad från 56.10521,12.88395 till 56.10173,12.87385 (utanför kommunen). Punkter 10+11 (42+141) sammanslagna till 183 bon (Kvidinge-Kyrka).",
+      "note": "Inventering av r\u00e5kbon 3 april 2026. Enbart \u00c5storps kommun. Punkt 9 korrigerad fr\u00e5n 56.10521,12.88395 till 56.10173,12.87385 (utanf\u00f6r kommunen). Punkter 10+11 (42+141) sammanslagna till 183 bon (Kvidinge-Kyrka).",
       "points": [
         {
           "lat": 56.17965,
@@ -3517,14 +3874,14 @@
     },
     {
       "session": "2026-04-10",
-      "note": "Inventering av råkbon 10 april 2026. Centrala/sydvästra området. 9 kluster identifierade: K19 (1), K24 (24), J26+K26 (32), L23 (5), N20 (61), O22+P22 (49), S24 (19), P26+P27 (24), S29+T29+U29 (30). Tomma rutor markerade i admin: 426 nya.",
+      "note": "Inventering av r\u00e5kbon 10 april 2026. Centrala/sydv\u00e4stra omr\u00e5det. 9 kluster identifierade: K19 (1), K24 (24), J26+K26 (32), L23 (5), N20 (61), O22+P22 (49), S24 (19), P26+P27 (24), S29+T29+U29 (30). Tomma rutor markerade i admin: 426 nya.",
       "total_nests": 245,
       "total_clusters": 9,
       "empty_grids_added": 426
     },
     {
       "session": "2026-04-15",
-      "note": "Inventering av råkbon 2026-04-15. 11 rutor inrapporterade. Originaldata: Ruta AU28: 9 BON;AT29:63;AY28:7+19;AY27:5;BA27:36+3;BB26:3;BB27:19+8+28;BC26:15;BD26:7;BC28:3;BB28:23+10+18+6 Tillagda 76 tomma rutor markerade i admin.",
+      "note": "Inventering av r\u00e5kbon 2026-04-15. 11 rutor inrapporterade. Originaldata: Ruta AU28: 9 BON;AT29:63;AY28:7+19;AY27:5;BA27:36+3;BB26:3;BB27:19+8+28;BC26:15;BD26:7;BC28:3;BB28:23+10+18+6 Tillagda 76 tomma rutor markerade i admin.",
       "total_nests": 282,
       "total_clusters": 11,
       "empty_grids_added": 76

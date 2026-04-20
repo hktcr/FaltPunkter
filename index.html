@@ -859,6 +859,10 @@ async function toggleCurrentRuta() {
     currentRutaVisible = false;
     btn.classList.remove('active');
     updateDisplay();
+    if (!gridVisible && !rookVisible && gridLayer) {
+        map.removeLayer(gridLayer);
+        gridLayer = null;
+    }
     return;
   }
   
@@ -870,6 +874,12 @@ async function toggleCurrentRuta() {
   btn.classList.add('active');
   btn.textContent = '▢ Ruta';
   updateDisplay();
+  
+  if (!gridVisible && !rookVisible) {
+      renderGrid();
+  } else {
+      refreshGridStyles();
+  }
 }
 
 async function loadGridData() {
@@ -1127,6 +1137,16 @@ function updateKPI() {
 // ============================================================
 // Grid Zoom Logic (Contextual Menu)
 // ============================================================
+function refreshGridStyles() {
+  if (gridLayer) {
+    if (rookVisible) {
+      renderRookOverlay();
+    } else {
+      renderGrid();
+    }
+  }
+}
+
 window.zoomGrid = function(level, targetId) {
     if (!gridData) return;
     const feature = gridData.features.find(f => f.properties.gridId === targetId);

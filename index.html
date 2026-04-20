@@ -237,14 +237,6 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
       <button class="zoom-btn" onclick="map.zoomIn()">+</button>
       <button class="zoom-btn" onclick="map.zoomOut()">−</button>
     </div>
-    <div id="grid-zoom-controls" style="background: var(--surface2); padding: 8px 12px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); border: 1px solid var(--border); display: none; flex-direction: column; gap: 6px; backdrop-filter: blur(16px); margin-top: 10px;">
-      <div style="font-size: 10px; text-transform: uppercase; color: var(--text-dim); font-weight: bold; text-align: center; letter-spacing: 0.5px;">Vy ruta: <span id="active-zoom-grid" style="color: var(--cyan);">-</span></div>
-      <div style="display: flex; gap: 6px; justify-content: center;">
-        <button id="btn-zoom-fit" class="zoom-btn" style="width: auto; height: auto; padding: 6px 10px; font-size: 11px;">Exakt</button>
-        <button id="btn-zoom-ring1" class="zoom-btn" style="width: auto; height: auto; padding: 6px 10px; font-size: 11px;">1:a ring</button>
-        <button id="btn-zoom-ring2" class="zoom-btn" style="width: auto; height: auto; padding: 6px 10px; font-size: 11px;">2:a ring</button>
-      </div>
-    </div>
   </div>
 
   <div class="coord-panel">
@@ -517,7 +509,6 @@ function updateContextBadges() {
 function updateDisplay() {
   updateCrosshairCoords();
   updateContextBadges();
-  updateGridZoomControls();
 }
 
 function isPointInAstorp(lat, lng) {
@@ -1076,6 +1067,26 @@ function renderRookOverlay() {
         }
         updateDisplay();
         refreshGridStyles();
+        
+        const popupHtml = `
+          <div class="grid-popup" style="min-width: 160px;">
+            <div class="gp-id" style="font-size: 1.1rem; color: #3b82f6; margin-bottom: 8px;">Ruta: ${id}</div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+               <button class="pt-btn" style="background:#141824; color:#fff; border:1px solid rgba(255,255,255,0.08); padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="zoomGrid('Exakt', '${id}')">Exakt Inblick (Ruta)</button>
+               <button class="pt-btn" style="background:#141824; color:#fff; border:1px solid rgba(255,255,255,0.08); padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="zoomGrid('Ring1', '${id}')">Närliggande (3x3 Rutor)</button>
+               <button class="pt-btn" style="background:#141824; color:#fff; border:1px solid rgba(255,255,255,0.08); padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="zoomGrid('Ring2', '${id}')">Vidvinkel (5x5 Rutor)</button>
+            </div>
+          </div>
+        `;
+        
+        L.popup({
+            closeButton: false,
+            className: 'custom-grid-popup',
+            offset: [0, -10]
+        })
+        .setLatLng(e.latlng)
+        .setContent(popupHtml)
+        .openOn(map);
       });
     }
   }).addTo(map);
@@ -1094,74 +1105,34 @@ function updateKPI() {
 }
 
 // ============================================================
-// Grid Zoom Controls (Exakt, 1:a ring, 2:a ring)
+// Grid Zoom Logic (Contextual Menu)
 // ============================================================
-function updateGridZoomControls() {
-  const ctrl = document.getElementById('grid-zoom-controls');
-  const span = document.getElementById('active-zoom-grid');
-  
-  if (!gridVisible && !rookVisible && !currentRutaVisible) {
-      ctrl.style.display = 'none';
-      return;
-  }
-  
-  let targetId = null;
-  if (selectedRutaId) {
-      targetId = selectedRutaId;
-  } else if (currentRutaVisible) {
-      const coords = getCurrentCoords();
-      targetId = getCurrentRuta(coords[0], coords[1]);
-  }
-  
-  if (targetId) {
-      span.textContent = targetId;
-      ctrl.style.display = 'flex';
-  } else {
-      ctrl.style.display = 'none';
-  }
-}
+window.zoomGrid = function(level, targetId) {
+    if (!gridData) return;
+    const feature = gridData.features.find(f => f.properties.gridId === targetId);
+    if (!feature) return;
 
-function refreshGridStyles() {
-  if (gridLayer) {
-    if (rookVisible) {
-      renderRookOverlay();
-    } else {
-      renderGrid();
+    if (level === 'Exakt') {
+        const layer = L.geoJSON(feature);
+        map.fitBounds(layer.getBounds(), { padding: [15, 15], maxZoom: 18 });
+    } else if (level === 'Ring1') {
+        // Expand the exact Bounding Box 250 meters in all directions
+        const bbox = turf.bbox(feature);
+        const bboxPoly = turf.bboxPolygon(bbox);
+        const expanded = turf.buffer(bboxPoly, 0.25, { units: 'kilometers' });
+        const layer = L.geoJSON(expanded);
+        map.fitBounds(layer.getBounds(), { padding: [10, 10], maxZoom: 16 });
+    } else if (level === 'Ring2') {
+        // Expand the exact Bounding Box 500 meters
+        const bbox = turf.bbox(feature);
+        const bboxPoly = turf.bboxPolygon(bbox);
+        const expanded = turf.buffer(bboxPoly, 0.50, { units: 'kilometers' });
+        const layer = L.geoJSON(expanded);
+        map.fitBounds(layer.getBounds(), { padding: [10, 10], maxZoom: 16 });
     }
-  }
-}
-
-function getZoomTargetPolygon() {
-  const targetId = document.getElementById('active-zoom-grid').textContent;
-  if (!targetId || targetId === '-' || !gridData) return null;
-  const feature = gridData.features.find(f => f.properties.gridId === targetId);
-  return feature ? feature : null;
-}
-
-document.getElementById('btn-zoom-fit').addEventListener('click', () => {
-    const poly = getZoomTargetPolygon();
-    if (!poly) return;
-    const layer = L.geoJSON(poly);
-    map.fitBounds(layer.getBounds(), { padding: [20, 20], maxZoom: 18 });
-});
-
-document.getElementById('btn-zoom-ring1').addEventListener('click', () => {
-    const poly = getZoomTargetPolygon();
-    if (!poly) return;
-    const centroid = turf.centroid(poly);
-    const buffered = turf.buffer(centroid, 0.40, { units: 'kilometers' });
-    const layer = L.geoJSON(buffered);
-    map.fitBounds(layer.getBounds(), { padding: [10, 10], maxZoom: 16 });
-});
-
-document.getElementById('btn-zoom-ring2').addEventListener('click', () => {
-    const poly = getZoomTargetPolygon();
-    if (!poly) return;
-    const centroid = turf.centroid(poly);
-    const buffered = turf.buffer(centroid, 0.65, { units: 'kilometers' });
-    const layer = L.geoJSON(buffered);
-    map.fitBounds(layer.getBounds(), { padding: [10, 10], maxZoom: 16 });
-});
+    
+    map.closePopup();
+};
 
 </script>
 </body>

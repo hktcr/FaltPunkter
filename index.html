@@ -805,10 +805,6 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-// INIT
-loadPoints();
-updateDisplay();
-
 // ========== GRID OVERLAY ==========
 let gridData = null;
 let gridLayer = null;
@@ -817,6 +813,10 @@ let gridVisible = false;
 let rookData = null;
 let rookVisible = false;
 let rookLayer = null;
+
+// INIT
+loadPoints();
+updateDisplay();
 
 const GRID_URLS = ['data/astorp-grid-250m.geojson', '../../Deployments/gaia-tools/rakor/data/astorp-grid-250m.geojson'];
 const ROOK_URLS = ['data/rakobservations.json', '../../Deployments/gaia-tools/rakor/data/rakobservations.json'];
@@ -1119,6 +1119,16 @@ function updateGridZoomControls() {
       ctrl.style.display = 'flex';
   } else {
       ctrl.style.display = 'none';
+  }
+}
+
+function refreshGridStyles() {
+  if (gridLayer) {
+    if (rookVisible) {
+      renderRookOverlay();
+    } else {
+      renderGrid();
+    }
   }
 }
 

@@ -239,6 +239,15 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
     </div>
   </div>
 
+  <div id="grid-zoom-controls" style="position: absolute; bottom: 180px; right: 10px; z-index: 1000; background: var(--surface2); padding: 8px 12px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); border: 1px solid var(--border); display: none; flex-direction: column; gap: 6px; backdrop-filter: blur(16px);">
+    <div style="font-size: 10px; text-transform: uppercase; color: var(--text-dim); font-weight: bold; text-align: center; letter-spacing: 0.5px;">Vy ruta: <span id="active-zoom-grid" style="color: var(--cyan);">-</span></div>
+    <div style="display: flex; gap: 6px; justify-content: center;">
+      <button id="btn-zoom-fit" style="padding: 6px 10px; font-size: 11px; font-weight: 700; background: var(--surface); color: var(--text-bright); border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">Exakt</button>
+      <button id="btn-zoom-ring1" style="padding: 6px 10px; font-size: 11px; font-weight: 700; background: var(--surface); color: var(--text-bright); border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">1:a ring</button>
+      <button id="btn-zoom-ring2" style="padding: 6px 10px; font-size: 11px; font-weight: 700; background: var(--surface); color: var(--text-bright); border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">2:a ring</button>
+    </div>
+  </div>
+
   <div class="coord-panel">
     <div class="coord-source">
       <button class="source-pill active" data-mode="center" onclick="setSource('center')">⊕ Karta</button>
@@ -509,6 +518,7 @@ function updateContextBadges() {
 function updateDisplay() {
   updateCrosshairCoords();
   updateContextBadges();
+  updateGridZoomControls();
 }
 
 function isPointInAstorp(lat, lng) {
@@ -1083,6 +1093,67 @@ function updateKPI() {
   document.getElementById('kpiBar').style.width = `${pct}%`;
   document.getElementById('kpiOverlay').classList.add('visible');
 }
+
+// ============================================================
+// Grid Zoom Controls (Exakt, 1:a ring, 2:a ring)
+// ============================================================
+function updateGridZoomControls() {
+  const ctrl = document.getElementById('grid-zoom-controls');
+  const span = document.getElementById('active-zoom-grid');
+  
+  if (!gridVisible && !rookVisible && !currentRutaVisible) {
+      ctrl.style.display = 'none';
+      return;
+  }
+  
+  let targetId = null;
+  if (selectedRutaId) {
+      targetId = selectedRutaId;
+  } else if (currentRutaVisible) {
+      const coords = getCurrentCoords();
+      targetId = getCurrentRuta(coords[0], coords[1]);
+  }
+  
+  if (targetId) {
+      span.textContent = targetId;
+      ctrl.style.display = 'flex';
+  } else {
+      ctrl.style.display = 'none';
+  }
+}
+
+function getZoomTargetPolygon() {
+  const targetId = document.getElementById('active-zoom-grid').textContent;
+  if (!targetId || targetId === '-' || !gridData) return null;
+  const feature = gridData.features.find(f => f.properties.gridId === targetId);
+  return feature ? feature : null;
+}
+
+document.getElementById('btn-zoom-fit').addEventListener('click', () => {
+    const poly = getZoomTargetPolygon();
+    if (!poly) return;
+    const layer = L.geoJSON(poly);
+    map.fitBounds(layer.getBounds(), { padding: [20, 20], maxZoom: 18 });
+});
+
+document.getElementById('btn-zoom-ring1').addEventListener('click', () => {
+    const poly = getZoomTargetPolygon();
+    if (!poly) return;
+    const centroid = turf.centroid(poly);
+    const buffered = turf.buffer(centroid, 0.40, { units: 'kilometers' });
+    const layer = L.geoJSON(buffered);
+    map.fitBounds(layer.getBounds(), { padding: [10, 10], maxZoom: 16 });
+});
+
+document.getElementById('btn-zoom-ring2').addEventListener('click', () => {
+    const poly = getZoomTargetPolygon();
+    if (!poly) return;
+    const centroid = turf.centroid(poly);
+    const buffered = turf.buffer(centroid, 0.65, { units: 'kilometers' });
+    const layer = L.geoJSON(buffered);
+    map.fitBounds(layer.getBounds(), { padding: [10, 10], maxZoom: 16 });
+});
+
 </script>
 </body>
 </html>

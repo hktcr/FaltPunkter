@@ -978,6 +978,26 @@ function renderGrid() {
         }
         updateDisplay();
         refreshGridStyles();
+        
+        const popupHtml = `
+          <div class="grid-popup" style="min-width: 160px;">
+            <div class="gp-id" style="font-size: 1.1rem; color: #3b82f6; margin-bottom: 8px;">Ruta: ${id}</div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+               <button class="pt-btn" style="background:#141824; color:#fff; border:1px solid rgba(255,255,255,0.08); padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="zoomGrid('Exakt', '${id}')">Exakt Inblick (Ruta)</button>
+               <button class="pt-btn" style="background:#141824; color:#fff; border:1px solid rgba(255,255,255,0.08); padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="zoomGrid('Ring1', '${id}')">Närliggande (3x3 Rutor)</button>
+               <button class="pt-btn" style="background:#141824; color:#fff; border:1px solid rgba(255,255,255,0.08); padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="zoomGrid('Ring2', '${id}')">Vidvinkel (5x5 Rutor)</button>
+            </div>
+          </div>
+        `;
+        
+        L.popup({
+            closeButton: false,
+            className: 'custom-grid-popup',
+            offset: [0, -10]
+        })
+        .setLatLng(e.latlng)
+        .setContent(popupHtml)
+        .openOn(map);
       });
     }
   }).addTo(map);

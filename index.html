@@ -237,14 +237,13 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
       <button class="zoom-btn" onclick="map.zoomIn()">+</button>
       <button class="zoom-btn" onclick="map.zoomOut()">−</button>
     </div>
-  </div>
-
-  <div id="grid-zoom-controls" style="position: absolute; bottom: 180px; right: 10px; z-index: 1000; background: var(--surface2); padding: 8px 12px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); border: 1px solid var(--border); display: none; flex-direction: column; gap: 6px; backdrop-filter: blur(16px);">
-    <div style="font-size: 10px; text-transform: uppercase; color: var(--text-dim); font-weight: bold; text-align: center; letter-spacing: 0.5px;">Vy ruta: <span id="active-zoom-grid" style="color: var(--cyan);">-</span></div>
-    <div style="display: flex; gap: 6px; justify-content: center;">
-      <button id="btn-zoom-fit" style="padding: 6px 10px; font-size: 11px; font-weight: 700; background: var(--surface); color: var(--text-bright); border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">Exakt</button>
-      <button id="btn-zoom-ring1" style="padding: 6px 10px; font-size: 11px; font-weight: 700; background: var(--surface); color: var(--text-bright); border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">1:a ring</button>
-      <button id="btn-zoom-ring2" style="padding: 6px 10px; font-size: 11px; font-weight: 700; background: var(--surface); color: var(--text-bright); border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">2:a ring</button>
+    <div id="grid-zoom-controls" style="background: var(--surface2); padding: 8px 12px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); border: 1px solid var(--border); display: none; flex-direction: column; gap: 6px; backdrop-filter: blur(16px); margin-top: 10px;">
+      <div style="font-size: 10px; text-transform: uppercase; color: var(--text-dim); font-weight: bold; text-align: center; letter-spacing: 0.5px;">Vy ruta: <span id="active-zoom-grid" style="color: var(--cyan);">-</span></div>
+      <div style="display: flex; gap: 6px; justify-content: center;">
+        <button id="btn-zoom-fit" class="zoom-btn" style="width: auto; height: auto; padding: 6px 10px; font-size: 11px;">Exakt</button>
+        <button id="btn-zoom-ring1" class="zoom-btn" style="width: auto; height: auto; padding: 6px 10px; font-size: 11px;">1:a ring</button>
+        <button id="btn-zoom-ring2" class="zoom-btn" style="width: auto; height: auto; padding: 6px 10px; font-size: 11px;">2:a ring</button>
+      </div>
     </div>
   </div>
 

@@ -2485,7 +2485,8 @@
       "status": "empty"
     },
     "AC31": {
-      "status": "empty"
+      "status": "nest",
+      "group": "G48"
     },
     "AC32": {
       "status": "empty"
@@ -4143,6 +4144,11 @@
       "label": "BB28",
       "count": 57,
       "session": "2026-04-15"
+    },
+    "G48": {
+      "label": "AC31",
+      "count": 6,
+      "session": "2026-04-21"
     }
   },
   "fieldnotes": [

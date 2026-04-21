@@ -1138,13 +1138,50 @@ function updateKPI() {
 // Grid Zoom Logic (Contextual Menu)
 // ============================================================
 function refreshGridStyles() {
-  if (gridLayer) {
-    if (rookVisible) {
-      renderRookOverlay();
+  if (!gridLayer) return;
+  gridLayer.eachLayer(function(layer) {
+    const id = layer.feature.properties.gridId;
+    const isSelected = (id === selectedRutaId);
+    
+    if (rookVisible && rookData) {
+      const info = rookData.grids ? rookData.grids[id] : null;
+      let baseColor, baseWeight = 1, baseFill, baseOpac = 1;
+      
+      if (info && info.status === 'nest') {
+        baseColor = 'rgba(16, 185, 129, 0.8)';
+        baseWeight = 2;
+        baseFill = 'rgba(16, 185, 129, 0.35)';
+      } else if (info && info.status === 'recheck') {
+        baseColor = 'rgba(245, 158, 11, 0.8)';
+        baseWeight = 2;
+        baseFill = 'rgba(245, 158, 11, 0.3)';
+      } else if (info && info.status === 'empty') {
+        baseColor = 'rgba(148, 163, 184, 0.15)';
+        baseWeight = 0.5;
+        baseFill = 'transparent';
+        baseOpac = 0;
+      } else {
+        baseColor = 'rgba(250, 204, 21, 0.5)';
+        baseFill = 'rgba(250, 204, 21, 0.15)';
+      }
+      
+      layer.setStyle({
+        color: isSelected ? '#3b82f6' : baseColor,
+        weight: isSelected ? 3 : baseWeight,
+        dashArray: isSelected ? '6,6' : null,
+        fillColor: baseFill,
+        fillOpacity: baseOpac
+      });
     } else {
-      renderGrid();
+      layer.setStyle({
+        color: isSelected ? '#3b82f6' : 'rgba(168, 85, 247, 0.5)',
+        weight: isSelected ? 3 : 1,
+        dashArray: isSelected ? '6,6' : null,
+        fillColor: 'rgba(168, 85, 247, 0.06)',
+        fillOpacity: 1
+      });
     }
-  }
+  });
 }
 
 window.zoomGrid = function(level, targetId) {

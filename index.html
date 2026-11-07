@@ -2,15 +2,17 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>FältPunkter — Positioner</title>
 <meta name="description" content="Verktyg för geografiska punkter, avstånd och listor">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+<meta name="theme-color" content="#081713">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/turf.min.js"></script>
+<script src="geo.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -217,6 +219,40 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
   0%, 100% { background-color: #1d4ed8; } /* djupblå */
   50% { background-color: #60a5fa; }    /* ljusblå */
 }
+
+/* Field-first, accessible layout. The coordinate panel never covers map controls. */
+:root{--text-dim:#9ba9b9;--border:rgba(255,255,255,.19);--sans:system-ui,-apple-system,'Segoe UI',sans-serif;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+html,body{min-height:100%;height:100dvh;overflow:auto;background:#081713}
+.map-wrap{display:flex;flex-direction:column;min-height:100dvh;flex:none}
+#map{height:27dvh;min-height:200px;flex:none;background:#142b25}
+.crosshair{top:max(100px,13.5dvh)}
+.coord-panel{position:relative;flex:1;padding:18px max(16px,calc((100% - 760px)/2)) max(18px,env(safe-area-inset-bottom));background:#0b1419}
+.zoom-btns{flex-direction:row}
+.right-controls{top:58px;max-width:calc(100% - 20px)}
+.layers{flex-wrap:wrap;justify-content:flex-end;gap:4px}
+.layer-pill{padding:8px 10px;font-size:.68rem;min-height:40px}
+.gps-badge{min-height:46px;color:var(--text);font:inherit}
+.gps-text{font-size:.75rem}
+.field-heading{font-size:1.05rem;color:#f0f2f6;margin:0 0 12px}
+.source-pill,.overlay-pill{min-height:44px}
+.astorp-badge{font-size:1rem;line-height:1.4;padding:12px 14px;width:100%;text-transform:none;letter-spacing:0;background:#123d30;color:#9bf2c1;border:1px solid #247d56}
+.astorp-badge.out{background:#3e2327;color:#ffc8c8;border-color:#a85252}
+.astorp-badge.uncertain{background:#3f3216;color:#ffe1a0;border-color:#ac8338}
+.astorp-badge.unknown{background:#202c38;color:#d7e1ed;border-color:#607085}
+.boundary-detail,.source-note{font-size:.82rem;line-height:1.5;margin:8px 0;color:#bbc7d7}
+.coords-block{align-items:center;margin:12px 0}.c-digits{font-size:clamp(1.45rem,5.5vw,2rem);user-select:all}
+.save-btn{padding:0 16px;min-height:48px;background:#246943}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.quick-actions button{min-height:50px;border-radius:12px;border:1px solid #2b806d;background:#123a32;color:#e0fff5;font:700 .9rem var(--sans);padding:10px}
+.quick-actions .primary{background:#53e0bd;color:#042b21}.copy-field{width:100%;background:#17242e;border:1px solid #637282;color:#f4f8fb;padding:12px;font:1rem var(--mono);border-radius:10px;user-select:all}
+button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #f4d171;outline-offset:3px}
+.privacy{font-size:.8rem;line-height:1.6;margin-top:16px;color:#b6c5d2}.privacy summary{cursor:pointer;min-height:35px;color:#b6f0da}.privacy a{color:#7cdcc7}.privacy p{margin:7px 0}
+.drawer{position:fixed;visibility:hidden}.drawer.open{visibility:visible}.dr-close{width:44px;height:44px}.drawer:focus{outline:none}.pt-coords{color:#bac8d9}.save-note{font-size:.8rem;line-height:1.5;color:#c2cfda;margin-bottom:12px}.modal-overlay{overflow:auto}.modal{max-height:90dvh;overflow:auto}.toast{max-width:92vw;font-size:.95rem}
+.leaflet-control-attribution{font-size:10px!important;max-width:90vw}.leaflet-bottom{bottom:0!important}
+@media (max-width:380px){.quick-actions{grid-template-columns:1fr}.overlay-pills{margin-left:0!important}.c-digits{font-size:1.45rem}.save-btn{padding:0 12px}.layer-pill{font-size:.6rem;padding:8px}.coord-panel{padding:14px 12px 20px}}
+@media (min-width:900px){#map{height:48dvh;min-height:300px}.crosshair{top:max(150px,24dvh)}.right-controls{top:10px}.coord-panel{padding-top:20px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
 </style>
 </head>
 <body>
@@ -224,31 +260,28 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
 <div class="map-wrap">
   <div id="map"></div>
   <div class="crosshair"><div class="ch-ring"></div><div class="ch-v"></div><div class="ch-h"></div><div class="ch-dot"></div></div>
-  <div class="gps-badge" id="gpsBadge" onclick="toggleGPS()"><div class="gps-dot off" id="gpsDot"></div><span class="gps-text" id="gpsText">GPS av</span></div>
+  <button class="gps-badge" id="gpsBadge" onclick="toggleGPS()" aria-pressed="false"><span class="gps-dot off" id="gpsDot"></span><span class="gps-text" id="gpsText">Starta GPS</span></button>
   <div class="right-controls">
     <div class="layers">
-      <button class="layer-pill active" data-layer="street">Karta</button>
+      <button class="layer-pill active" data-layer="none">Privat vy</button><button class="layer-pill" data-layer="street">Karta</button>
       <button class="layer-pill" data-layer="topowebb">Grön</button>
       <button class="layer-pill" data-layer="terrain">Terr</button>
       <button class="layer-pill" data-layer="satellite">Sat</button>
     </div>
-    <button class="center-btn" onclick="centerOnGPS()" title="Centrera">🎯</button>
+    <button class="center-btn" onclick="centerOnGPS()" title="Visa min GPS-position" aria-label="Visa min GPS-position">🎯</button>
     <div class="zoom-btns">
-      <button class="zoom-btn" onclick="map.zoomIn()">+</button>
-      <button class="zoom-btn" onclick="map.zoomOut()">−</button>
+      <button class="zoom-btn" onclick="map.zoomIn()" aria-label="Zooma in">+</button>
+      <button class="zoom-btn" onclick="map.zoomOut()" aria-label="Zooma ut">−</button>
     </div>
   </div>
 
-  <div class="coord-panel">
+  <main class="coord-panel">
+    <h1 class="field-heading">FältPunkter · Åstorps kommun</h1>
     <div class="coord-source">
-      <button class="source-pill active" data-mode="center" onclick="setSource('center')">⊕ Karta</button>
-      <button class="source-pill" data-mode="gps" onclick="setSource('gps')">📡 GPS</button>
+      <button class="source-pill" data-mode="center" onclick="setSource('center')">⊕ Karta</button>
+      <button class="source-pill active" data-mode="gps" onclick="setSource('gps')">📡 GPS</button>
       <button class="source-pill" data-mode="tap" onclick="setSource('tap')">👆 Tryck</button>
-      <div class="overlay-pills" style="margin-left: auto;">
-        <button class="overlay-pill" id="btnGrid" onclick="toggleGrid()">▦ Rutnät</button>
-        <button class="overlay-pill" id="btnCurrentRuta" onclick="toggleCurrentRuta()">▢ Ruta</button>
-        <button class="overlay-pill rook-pill" id="btnRook" onclick="toggleRookOverlay()">🐦 Råkor</button>
-      </div>
+
     </div>
     <div class="kpi-strip-inline" id="kpiOverlay">
       <span class="kpi-label-ov">Inventerat</span>
@@ -257,35 +290,54 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
       <span class="kpi-label-ov" id="kpiPct">0%</span>
     </div>
     <div class="coord-source" style="margin-bottom:0;padding-top:0">
-      <div class="astorp-badge" id="astorpBadge" style="display:none">📍 ÅSTORP</div>
+      <div class="astorp-badge unknown" id="astorpBadge" role="status" aria-live="polite">Starta GPS för att se var du är</div>
       <div class="ruta-badge" id="rutaBadge" style="display:none">▢ <span id="rutaVal">-</span></div>
       <div class="ruta-badge gps" id="gpsRutaBadge" style="display:none">📡 ▢ <span id="gpsRutaVal">-</span></div>
       <div class="acc-tag" id="accTag" style="display:none">±<span class="val" id="accVal">?</span>m</div>
     </div>
     
+    <p class="boundary-detail" id="boundaryDetail"></p>
+    <p class="source-note" id="sourceNote"></p>
     <div class="coords-block">
       <div class="coords-left">
         <div class="coord-row"><span class="c-label">N</span><span class="c-digits" id="latDigits"><span class="int">56</span><span class="dot">.</span><span class="dec">13090</span></span></div>
         <div class="coord-row"><span class="c-label">E</span><span class="c-digits" id="lngDigits"><span class="int">12</span><span class="dot">.</span><span class="dec">99170</span></span></div>
       </div>
-      <button class="save-btn" onclick="openSaveModal()">
+      <button class="save-btn" id="saveButton" onclick="openSaveModal()" disabled>
         <span>Spara</span>
         <span style="font-size:1.2rem">📌</span>
       </button>
     </div>
 
-    <button class="list-btn" onclick="openDrawer()">
-      <span>Visa positioner</span>
-      <span class="list-count" id="btnCount">0</span>
-    </button>
-  </div>
+    <label class="source-note" for="copyValue">WGS84 · latitud, longitud · decimalpunkt</label>
+    <input id="copyValue" class="copy-field" readonly value="" placeholder="Inväntar position" aria-label="Koordinater att kopiera" onclick="this.select()">
+    <div class="quick-actions">
+      <button class="primary" id="copyButton" onclick="copyCoords()" disabled>Kopiera koordinater</button>
+      <button onclick="centerOnGPS()">Hämta min position</button>
+    </div>
+    <button class="list-btn" onclick="openDrawer()"><span>Visa sparade positioner</span><span class="list-count" id="btnCount">0</span></button>
+    <details class="privacy"><summary>Inventeringslager: rutnät &amp; råkor</summary>      <div class="overlay-pills" style="margin-left: auto;">
+        <button class="overlay-pill" id="btnGrid" onclick="toggleGrid()">▦ Rutnät</button>
+        <button class="overlay-pill" id="btnCurrentRuta" onclick="toggleCurrentRuta()">▢ Ruta</button>
+        <button class="overlay-pill rook-pill" id="btnRook" onclick="toggleRookOverlay()">🐦 Råkor</button>
+      </div></details>
+    <details class="privacy"><summary>Integritet, precision &amp; hjälp</summary>
+      <p>GPS startar bara när du ber om det. Koordinater och gränskontroll behandlas i din webbläsare. Privat vy laddar inga externa kartbilder. Väljer du Karta, Grön, Terr eller Sat får kartleverantören din IP-adress och det kartområde du visar. Växla tillbaka till Privat vy för att stoppa nya kartanrop.</p>
+      <p>En position blir aldrig helt exakt. ±-värdet är webbläsarens uppskattade noggrannhet. Nära gränsen visas ”Osäkert” när noggrannhetsradien plus en försiktighetsmarginal på 10 m når gränsen. Marginalen är inte en garanti för kartans riktighet.</p>
+      <p>Gräns: <a href="https://www.openstreetmap.org/relation/935517" target="_blank" rel="noopener noreferrer">OpenStreetMap, relation 935517</a>, © OpenStreetMap-bidragsgivare, <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL</a>. Befintlig projektfil från senast april 2026; exakt uttagsdatum saknas. Inte en juridisk gränsbestämning.</p>
+      <p>”Spara” lagrar endast på den här enheten i webbläsaren. Exportera en säkerhetskopia innan du rensar webbplatsdata. Positionshistorik skickas inte till GitHub. Själva webbsidan är offentlig och GitHub hanterar vanliga åtkomstloggar.</p>
+      <p>GPS behöver HTTPS och platsåtkomst. På iPhone: Inställningar → Integritet och säkerhet → Platstjänster och tillåt exakt plats för webbläsaren. Du kan lägga sidan på hemskärmen via Dela. Appens kärna blir tillgänglig utan nät efter en lyckad inläsning; bakgrundskartor kräver nät.</p>
+      <p id="offlineStatus">Offlinekopian förbereds vid första besöket.</p>
+      <p>Version 2026-11-07 · <a href="https://github.com/hktcr/FaltPunkter" target="_blank" rel="noopener noreferrer">Källkod</a></p>
+    </details>
+  </main>
 </div>
 
 <!-- DRAWER -->
-<div class="drawer" id="listDrawer">
+<section class="drawer" id="listDrawer" role="dialog" aria-modal="true" aria-label="Sparade positioner" tabindex="-1" inert>
   <div class="dr-header">
     <div class="dr-title">Sparade positioner (<span id="drCount">0</span>)</div>
-    <button class="dr-close" onclick="closeDrawer()">×</button>
+    <button class="dr-close" onclick="closeDrawer()" aria-label="Stäng sparade positioner">×</button>
   </div>
   <div class="dr-sort">
     <button class="sort-btn active" id="sortTime" onclick="setSort('time')">Senaste först</button>
@@ -297,19 +349,19 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
   <div style="padding:16px; border-top:1px solid var(--border)">
     <button class="list-btn" onclick="exportTSV()" style="color:var(--accent);border-color:var(--border)">📥 Exportera data (TSV)</button>
   </div>
-</div>
+</section>
 
 <!-- SAVE MODAL -->
 <div class="modal-overlay" id="saveModalOverlay">
-  <div class="modal center">
-    <h3>Spara Position</h3>
+  <div class="modal center" role="dialog" aria-modal="true" aria-labelledby="saveTitle">
+    <h3 id="saveTitle">Spara position på enheten</h3><p id="saveSnapshot" class="save-note"></p>
     <div class="form-group">
-      <label>Namn på plats / beskrivning</label>
-      <input type="text" id="ptName" placeholder="T.ex. Klippan, Träd A...">
+      <label for="ptName">Namn på plats / beskrivning</label>
+      <input type="text" id="ptName" maxlength="200" placeholder="T.ex. Klippan, Träd A...">
     </div>
     <div class="form-group">
-      <label>Valfri Tagg (kategori)</label>
-      <input type="text" id="ptTag" placeholder="T.ex. Inventering 2026">
+      <label for="ptTag">Valfri tagg (kategori)</label>
+      <input type="text" id="ptTag" maxlength="100" placeholder="T.ex. Inventering 2026">
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeSaveModal()">Avbryt</button>
@@ -318,19 +370,26 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;background:#000;
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 // CONSTANTS
 const DEFAULT_CENTER = [56.1309, 12.9917];
 let astorpBoundary = null;
+let boundaryState = 'loading';
 
 // STATE
-let source = 'center';
+let source = 'gps';
 let gpsOn = false;
 let gpsWatchId = null;
 let gpsPos = null;
 let gpsAcc = null;
+let gpsTimestamp = null;
+let gpsError = '';
+let gpsGeneration = 0;
+let saveSnapshot = null;
+let storageBlocked = false;
+let storageRaw = null;
 let tapPos = null;
 let points = [];
 let sortBy = 'time'; // 'time' | 'dist'
@@ -340,45 +399,46 @@ let selectedRutaId = null;
 let waitingForGPSCenter = false;
 
 // MAP
-const map = L.map('map', { zoomControl: false, attributionControl: false }).setView(DEFAULT_CENTER, 14);
+const map = L.map('map', { zoomControl: false, attributionControl: true }).setView(DEFAULT_CENTER, 14);
 
 const tiles = {
-  street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }),
+  street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO' }),
   topowebb: L.tileLayer('https://minkarta.lantmateriet.se/map/topowebbcache/?layer=topowebb&style=default&tilematrixset=3857&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix={z}&TileCol={x}&TileRow={y}', { 
     maxZoom: 15, 
     attribution: '&copy; <a href="https://www.lantmateriet.se/en/">Lantmäteriet</a>' 
   }),
-  terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 }),
-  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 })
+  terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '&copy; OpenStreetMap contributors, SRTM | OpenTopoMap (CC-BY-SA)' }),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri, Maxar, Earthstar Geographics and the GIS User Community' })
 };
-tiles.street.addTo(map);
+// Private view is the default: no third-party map requests until chosen.
+map.attributionControl.addAttribution('Gräns © OpenStreetMap-bidragsgivare');
 
 document.querySelectorAll('.layer-pill').forEach(btn => {
   btn.addEventListener('click', function() {
+    if (this.dataset.layer !== 'none' && !confirm('Bakgrundskartan skickar din IP-adress och området du visar till kartleverantören. Visa kartan?')) return;
     document.querySelectorAll('.layer-pill').forEach(b => b.classList.remove('active'));
     this.classList.add('active');
     Object.values(tiles).forEach(t => map.removeLayer(t));
-    tiles[this.dataset.layer].addTo(map);
+    if (tiles[this.dataset.layer]) tiles[this.dataset.layer].addTo(map);
   });
 });
 
-fetch('astorp.geojson')
-  .then(res => res.json())
-  .then(data => {
+async function loadBoundary() {
+  try {
+    const res = await fetch('astorp.geojson');
+    if (!res.ok) throw new Error('Boundary HTTP ' + res.status);
+    const data = await res.json();
+    if (FaltGeo.classify(data, ...DEFAULT_CENTER).status === 'unknown') throw new Error('Invalid boundary');
     astorpBoundary = data;
-    L.geoJSON(astorpBoundary, {
-      style: { color: 'rgba(59,130,246,0.9)', weight: 3, fillColor: 'rgba(59,130,246,0.05)', fillOpacity: 1, dashArray: '4,4' },
-      interactive: false
-    }).addTo(map);
-    updateDisplay();
-  })
-  .catch(err => console.error("Kunde inte ladda kommungräns:", err));
-
-L.control.scale({ position: 'bottomleft', imperial: false, maxWidth: 120 }).addTo(map);
-setTimeout(() => {
-  const scale = document.querySelector('.leaflet-control-scale');
-  if(scale) { scale.style.marginBottom = '180px'; scale.style.marginLeft = '12px'; }
-}, 500);
+    boundaryState = 'ready';
+    const layer = L.geoJSON(data, {style:{color:'#72d8af',weight:3,fillColor:'#4bbb8d',fillOpacity:.08,dashArray:'5,5'},interactive:false}).addTo(map);
+    if (!gpsPos && source === 'gps') map.fitBounds(layer.getBounds(), {padding:[30,30]});
+  } catch (_) { boundaryState = 'error'; }
+  updateDisplay();
+}
+loadBoundary();
+L.control.scale({ position:'bottomleft',imperial:false,maxWidth:100 }).addTo(map);
+Object.values(tiles).forEach(layer => layer.on('tileerror', () => { document.getElementById('offlineStatus').textContent = 'Bakgrundskartan kunde inte laddas. GPS och lokal gränskontroll fungerar ändå.'; }));
 
 let gpsMarker = null;
 let gpsCircle = null;
@@ -388,79 +448,74 @@ let pointLayer = L.layerGroup().addTo(map);
 // LOAD POINTS
 function loadPoints() {
   try {
-    const data = localStorage.getItem('faltpunkter_db');
-    if (data) points = JSON.parse(data);
-  } catch (e) { console.error("Could not load points", e); }
+    const raw = localStorage.getItem('faltpunkter_db');
+    storageRaw=raw;
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (!Array.isArray(data) || data.some(p => !p || !FaltGeo.validateCoords(p.lat,p.lng) || typeof p.id !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(p.id) || typeof p.name !== 'string' || (p.tag != null && typeof p.tag !== 'string'))) throw new Error('Invalid saved data');
+      points = data;
+    }
+  } catch (_) { storageBlocked = true; toast('Sparade data kunde inte läsas. Inget skrivs över.'); }
   updateUI();
 }
-
 function persistPoints() {
-  localStorage.setItem('faltpunkter_db', JSON.stringify(points));
-  updateUI();
-}
-
-// COORD DISPLAY
-function fmt(val) {
-  const s = val.toFixed(5);
-  const parts = s.split('.');
-  return { int: parts[0], dec: parts[1] };
-}
-
-function getCurrentCoords() {
-  if (source === 'gps' && gpsPos) return gpsPos;
-  if (source === 'tap' && tapPos) return tapPos;
-  const c = map.getCenter();
-  return [c.lat, c.lng];
-}
-
-function updateCrosshairCoords() {
-  let lat, lng, warn = false;
-  if (source === 'gps') {
-    if (gpsPos) { lat = gpsPos[0]; lng = gpsPos[1]; warn = gpsAcc > 30; }
-    else { lat = 0; lng = 0; warn = true; }
-  } else if (source === 'tap') {
-    if (tapPos) { lat = tapPos[0]; lng = tapPos[1]; }
-    else { const c = map.getCenter(); lat = c.lat; lng = c.lng; }
-  } else {
-    const c = map.getCenter();
-    lat = c.lat; lng = c.lng;
+  if (storageBlocked) { toast('Lagringen är blockerad för att skydda befintliga data.'); return false; }
+  try {
+    if(localStorage.getItem('faltpunkter_db')!==storageRaw){toast('Data har ändrats i en annan flik. Ladda om innan du sparar.');return false;}
+    const next=JSON.stringify(points);localStorage.setItem('faltpunkter_db',next);storageRaw=next;updateUI();return true;
   }
-
-  const la = fmt(lat), lo = fmt(lng);
-  const warnClass = warn ? ' warn' : '';
-  document.getElementById('latDigits').className = 'c-digits' + warnClass;
-  document.getElementById('latDigits').innerHTML = `<span class="int">${la.int}</span><span class="dot">.</span><span class="dec">${la.dec}</span>`;
-  document.getElementById('lngDigits').className = 'c-digits' + warnClass;
-  document.getElementById('lngDigits').innerHTML = `<span class="int">${lo.int}</span><span class="dot">.</span><span class="dec">${lo.dec}</span>`;
+  catch (_) { toast('Kunde inte spara på enheten. Lagringen kan vara full eller avstängd.'); return false; }
+}
+window.addEventListener('storage',event=>{if(event.key==='faltpunkter_db'){if(saveSnapshot){toast('En annan flik ändrade sparade punkter. Stäng dialogen och ladda om.');}else{loadPoints();renderList();updateDisplay();}}});
+function escapeHTML(value) { return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function gpsFresh() { return !!gpsPos && Number.isFinite(gpsTimestamp) && Date.now()-gpsTimestamp <= 30000 && Date.now()-gpsTimestamp >= -5000; }
+function getCurrentCoords() {
+  if (source === 'gps') return gpsFresh() ? gpsPos : null;
+  if (source === 'tap') return tapPos && FaltGeo.validateCoords(...tapPos) ? tapPos : null;
+  const c=map.getCenter().wrap(); return FaltGeo.validateCoords(c.lat,c.lng) ? [c.lat,c.lng] : null;
+}
+function coordsText(coords) { return coords.map(v=>v.toFixed(6)).join(', '); }
+function updateCrosshairCoords() {
+  const c = getCurrentCoords();
+  ['latDigits','lngDigits'].forEach((id,i)=>{
+    const el=document.getElementById(id); el.textContent=c ? c[i].toFixed(6) : '—';
+    el.className='c-digits'+(source==='gps' && gpsAcc>30?' warn':'');
+  });
+  const copyField=document.getElementById('copyValue');if(document.activeElement!==copyField)copyField.value=c ? coordsText(c) : '';
+  document.getElementById('copyButton').disabled=!c;
+  document.getElementById('saveButton').disabled=!c || storageBlocked;
+  const age=gpsTimestamp ? Math.max(0,Math.round((Date.now()-gpsTimestamp)/1000)) : null;
+  document.getElementById('sourceNote').textContent=source==='gps'
+    ? (c ? `Din GPS-position · uppskattad noggrannhet ±${Math.ceil(gpsAcc)} m · ${age} s gammal` : gpsError || (gpsPos ? 'Positionen är äldre än 30 s. Väntar på en ny GPS-mätning.' : gpsOn ? 'Söker GPS. Stå gärna stilla med fri sikt mot himlen.' : 'Tryck ”Hämta min position”. Ingen platsåtkomst sker före ditt val.'))
+    : source==='center' ? 'Kartans mittpunkt. Detta är inte din GPS-position.' : 'Vald kartpunkt. Detta är inte din GPS-position.';
+  document.getElementById('accTag').style.display=source==='gps' && c ? '' : 'none';
+}
+async function copyCoords() {
+  const coords=getCurrentCoords();
+  if (!coords) return toast('Ingen aktuell position att kopiera.');
+  const text=coordsText(coords);
+  try { if (!navigator.clipboard || !window.isSecureContext) throw new Error(); await navigator.clipboard.writeText(text); toast('Koordinater kopierade'); }
+  catch (_) { const field=document.getElementById('copyValue');field.value=text;field.focus();field.select();field.setSelectionRange(0,text.length);toast('Markeringen är klar. Välj Kopiera i webbläsaren.'); }
+}
+function updateBoundaryStatus() {
+  const badge=document.getElementById('astorpBadge'), detail=document.getElementById('boundaryDetail'), c=getCurrentCoords();
+  let state='unknown', title, message;
+  if (!c) { title=source==='gps'?'GPS-position saknas eller är för gammal':'Välj en punkt på kartan'; message='Ingen bedömning av kommungränsen görs utan en aktuell punkt.'; }
+  else if (boundaryState!=='ready') { title=boundaryState==='loading'?'Kommungränsen laddas…':'Kommungränsen saknas'; message='Koordinaterna kan kopieras, men innanför/utanför kan inte avgöras. Ladda om sidan med nätanslutning.'; }
+  else {
+    const result=FaltGeo.classify(astorpBoundary,c[0],c[1],source==='gps'?gpsAcc:0); state=result.status;
+    const prefix=source==='gps'?'Din position':'Vald punkt';
+    title=state==='inside'?`${prefix}: innanför Åstorps kommun`:state==='outside'?`${prefix}: utanför Åstorps kommun`:state==='uncertain'?'Osäkert nära kommungränsen':'Gränskontroll kunde inte göras';
+    message=Number.isFinite(result.distanceMeters)?`Cirka ${formatDist(result.distanceMeters)} till kartans kommungräns. `:'';
+    message+=state==='uncertain'?'Noggrannheten och kartmarginalen överlappar gränsen. Flytta dig längre från gränsen eller kontrollera med kommunens kartunderlag.':'Bedömning enligt OpenStreetMap. Kartgränsen kan avvika från den juridiska gränsen.';
+  }
+  badge.className='astorp-badge '+(state==='outside'?'out':state);badge.textContent=title;detail.textContent=message;
 }
 
 function updateContextBadges() {
-  let lat, lng;
-  if (source === 'gps') {
-    if (gpsPos) { lat = gpsPos[0]; lng = gpsPos[1]; }
-    else { lat = 0; lng = 0; }
-  } else if (source === 'tap') {
-    if (tapPos) { lat = tapPos[0]; lng = tapPos[1]; }
-    else { const c = map.getCenter(); lat = c.lat; lng = c.lng; }
-  } else {
-    const c = map.getCenter();
-    lat = c.lat; lng = c.lng;
-  }
-
-  const astBadge = document.getElementById('astorpBadge');
-  if(astBadge) {
-    const inAstorp = isPointInAstorp(lat, lng);
-    if (inAstorp) {
-      astBadge.style.display = '';
-      astBadge.className = 'astorp-badge';
-      astBadge.textContent = '📍 Åstorp';
-    } else {
-      astBadge.style.display = '';
-      astBadge.className = 'astorp-badge out';
-      astBadge.textContent = 'Utanför';
-    }
-  }
-
+  updateBoundaryStatus();
+  const coords=getCurrentCoords();
+  const lat=coords ? coords[0] : NaN, lng=coords ? coords[1] : NaN;
   if (currentRutaVisible) {
     const currentId = getCurrentRuta(lat, lng);
     const displayId = selectedRutaId || currentId;
@@ -482,7 +537,7 @@ function updateContextBadges() {
     
     // Ytterligare badge för GPS-rutan om vi inte redan tittar på GPS-källan
     const gpsRutaBadge = document.getElementById('gpsRutaBadge');
-    if (gpsOn && source !== 'gps') {
+    if (gpsFresh() && source !== 'gps') {
       const gLat = gpsPos ? gpsPos[0] : 0;
       const gLng = gpsPos ? gpsPos[1] : 0;
       const gId = getCurrentRuta(gLat, gLng);
@@ -511,16 +566,10 @@ function updateDisplay() {
   updateContextBadges();
 }
 
-function isPointInAstorp(lat, lng) {
-  if (!astorpBoundary || typeof turf === 'undefined') return false;
-  try {
-    const pt = turf.point([lng, lat]);
-    return turf.booleanPointInPolygon(pt, astorpBoundary);
-  } catch (e) { return false; }
-}
+function isPointInAstorp(lat,lng) { return FaltGeo.classify(astorpBoundary,lat,lng).inside === true; }
 
 map.on('dragstart', () => { if (source === 'gps') setSource('center'); });
-map.on('move', () => { if (source === 'center') updateCrosshairCoords(); });
+map.on('move', () => { if (source === 'center') updateDisplay(); });
 map.on('moveend', () => { if (source === 'center') updateContextBadges(); });
 
 map.on('click', function(e) {
@@ -528,7 +577,8 @@ map.on('click', function(e) {
     selectedRutaId = null;
     updateDisplay();
   }
-  tapPos = [e.latlng.lat, e.latlng.lng];
+  const wrapped=e.latlng.wrap();if(!FaltGeo.validateCoords(wrapped.lat,wrapped.lng))return;
+  tapPos = [wrapped.lat, wrapped.lng];
   if (tapMarker) map.removeLayer(tapMarker);
   tapMarker = L.circleMarker(e.latlng, {
     radius: 12, color: '#a855f7', fillColor: '#a855f7', fillOpacity: 0.25, weight: 2.5
@@ -538,90 +588,56 @@ map.on('click', function(e) {
 });
 
 function setSource(mode) {
-  source = mode;
-  document.querySelectorAll('.source-pill').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-  if (mode === 'gps' && !gpsOn) toggleGPS();
+  source=mode;
+  document.querySelectorAll('.source-pill').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode));});
+  if (mode==='gps' && !gpsOn) startGPS();
   updateDisplay();
 }
-
-// GPS
-function toggleGPS() {
-  const badge = document.getElementById('gpsBadge');
-  const dot = document.getElementById('gpsDot');
-  const txt = document.getElementById('gpsText');
-
-  if (gpsOn) {
-    if (gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
-    gpsOn = false; gpsWatchId = null; gpsPos = null; gpsAcc = null;
-    badge.className = 'gps-badge';
-    dot.className = 'gps-dot off';
-    txt.textContent = 'GPS av';
-    document.getElementById('accTag').style.display = 'none';
-    if (gpsMarker) { map.removeLayer(gpsMarker); gpsMarker = null; }
-    if (gpsCircle) { map.removeLayer(gpsCircle); gpsCircle = null; }
-    if (source === 'gps') setSource('center');
-    renderList(); // Refresh distances (remove)
-    return;
-  }
-
-  if (!navigator.geolocation) { toast('Ingen GPS'); return; }
-  gpsOn = true;
-  badge.className = 'gps-badge tracking searching';
-  dot.className = 'gps-dot ok';
-  txt.textContent = 'Söker...';
-
-  gpsWatchId = navigator.geolocation.watchPosition(pos => {
-    gpsPos = [pos.coords.latitude, pos.coords.longitude];
-    gpsAcc = pos.coords.accuracy;
-
-    if (waitingForGPSCenter) {
-      map.setView(gpsPos, Math.max(map.getZoom(), 17));
-      waitingForGPSCenter = false;
-    }
-
-    if (gpsMarker) map.removeLayer(gpsMarker);
-    const pulseIcon = L.divIcon({
-      className: '',
-      html: '<div class="gps-pulse-wrapper"><div class="gps-pulse-ring"></div><div class="gps-pulse-inner"></div></div>',
-      iconSize: [14, 14],
-      iconAnchor: [7, 7]
-    });
-    gpsMarker = L.marker(gpsPos, { icon: pulseIcon }).addTo(map);
-
-    if (gpsCircle) map.removeLayer(gpsCircle);
-    gpsCircle = L.circle(gpsPos, {
-      radius: gpsAcc, color: 'rgba(46,232,200,.35)', fillColor: 'rgba(46,232,200,.08)',
-      fillOpacity: 1, weight: 1, dashArray: '4,4'
-    }).addTo(map);
-
-    badge.className = 'gps-badge tracking';
-    const q = gpsAcc < 10 ? 'good' : gpsAcc < 30 ? 'ok' : 'poor';
-    dot.className = 'gps-dot ' + q;
-    txt.textContent = `±${Math.round(gpsAcc)}m`;
-
-    const tag = document.getElementById('accTag');
-    tag.style.display = '';
-    tag.className = 'acc-tag ' + q;
-    document.getElementById('accVal').textContent = Math.round(gpsAcc);
-
-    if (source === 'gps') updateDisplay();
-    renderList(); // Live distance update
-  }, err => {
-    toast('GPS-fel');
-    toggleGPS();
-  }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 });
+function stopGPS(error='') {
+  gpsGeneration++;
+  if (gpsWatchId!==null) navigator.geolocation.clearWatch(gpsWatchId);
+  gpsWatchId=null;gpsOn=false;gpsPos=null;gpsAcc=null;gpsTimestamp=null;waitingForGPSCenter=false;gpsError=error;
+  const badge=document.getElementById('gpsBadge');badge.className='gps-badge';badge.setAttribute('aria-pressed','false');
+  document.getElementById('gpsDot').className='gps-dot off';document.getElementById('gpsText').textContent='Starta GPS';
+  if(gpsMarker){map.removeLayer(gpsMarker);gpsMarker=null;} if(gpsCircle){map.removeLayer(gpsCircle);gpsCircle=null;}
+  updateDisplay();renderList();
 }
-
-function centerOnGPS() {
-  if (gpsPos) { 
-    map.setView(gpsPos, Math.max(map.getZoom(), 17)); 
-    waitingForGPSCenter = false;
-  } else { 
-    if (!gpsOn) toggleGPS(); 
-    toast('Söker GPS...'); 
-    waitingForGPSCenter = true;
-  }
+function toggleGPS() { if (gpsOn) stopGPS(); else {source='gps';setSource('gps');} }
+function startGPS() {
+  if(gpsOn) return;
+  if(!window.isSecureContext || !navigator.geolocation){gpsError='GPS kräver en webbläsare med platsstöd och HTTPS.';updateDisplay();return;}
+  gpsOn=true;gpsError='';const generation=++gpsGeneration;
+  const badge=document.getElementById('gpsBadge');badge.className='gps-badge tracking searching';badge.setAttribute('aria-pressed','true');
+  document.getElementById('gpsText').textContent='Söker GPS · stoppa';
+  gpsWatchId=navigator.geolocation.watchPosition(pos=>{
+    if(!gpsOn || generation!==gpsGeneration) return;
+    const {latitude,longitude,accuracy}=pos.coords;
+    if(!FaltGeo.validateCoords(latitude,longitude) || !Number.isFinite(accuracy) || accuracy<0 || !Number.isFinite(pos.timestamp)){gpsError='GPS gav en ogiltig mätning. Försök igen.';updateDisplay();return;}
+    gpsPos=[latitude,longitude];gpsAcc=accuracy;gpsTimestamp=pos.timestamp;gpsError='';
+    if(!gpsFresh()){updateDisplay();return;}
+    if(waitingForGPSCenter){map.setView(gpsPos,Math.max(map.getZoom(),16));waitingForGPSCenter=false;}
+    if(gpsMarker)map.removeLayer(gpsMarker);if(gpsCircle)map.removeLayer(gpsCircle);
+    gpsMarker=L.circleMarker(gpsPos,{radius:7,color:'#fff',fillColor:'#38d9ba',fillOpacity:1,weight:2}).addTo(map);
+    gpsCircle=L.circle(gpsPos,{radius:accuracy,color:'#53e0bd',fillColor:'#53e0bd',fillOpacity:.1,weight:1}).addTo(map);
+    badge.className='gps-badge tracking';const q=accuracy<10?'good':accuracy<30?'ok':'poor';
+    document.getElementById('gpsDot').className='gps-dot '+q;document.getElementById('gpsText').textContent=`GPS ±${Math.ceil(accuracy)} m · stoppa`;
+    document.getElementById('accTag').className='acc-tag '+q;document.getElementById('accVal').textContent=Math.ceil(accuracy);
+    updateDisplay();renderList();
+  },err=>{
+    if(generation!==gpsGeneration) return;
+    const messages={1:'Platsåtkomst nekades. Tillåt plats i webbläsarens webbplatsinställningar och försök igen.',2:'Positionen är inte tillgänglig. Kontrollera platstjänsterna och försök utomhus.',3:'GPS tog för lång tid. Tryck Hämta min position för att försöka igen.'};
+    stopGPS(messages[err.code] || 'GPS kunde inte läsas. Försök igen.');
+  },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
 }
+function centerOnGPS(){waitingForGPSCenter=true;setSource('gps');if(gpsFresh()){map.setView(gpsPos,Math.max(map.getZoom(),16));waitingForGPSCenter=false;}}
+setInterval(()=>{
+  if(gpsOn && gpsPos && !gpsFresh()){
+    if(gpsMarker){map.removeLayer(gpsMarker);gpsMarker=null;}if(gpsCircle){map.removeLayer(gpsCircle);gpsCircle=null;}
+    document.getElementById('gpsDot').className='gps-dot poor';document.getElementById('gpsText').textContent='GPS inaktuell · stoppa';
+  }
+  updateDisplay();
+},1000);
+window.addEventListener('pagehide',()=>{if(gpsOn)stopGPS();});
 
 // HAVERSINE DISTANCE
 function haversine(lat1, lon1, lat2, lon2) {
@@ -636,7 +652,7 @@ function haversine(lat1, lon1, lat2, lon2) {
 }
 
 function getDistances(pts) {
-  const refPos = gpsOn && gpsPos ? gpsPos : [map.getCenter().lat, map.getCenter().lng];
+  const refPos = gpsFresh() ? gpsPos : [map.getCenter().lat, map.getCenter().wrap().lng];
   return pts.map(p => {
     const dist = haversine(refPos[0], refPos[1], p.lat, p.lng);
     return { ...p, dist };
@@ -650,6 +666,9 @@ function formatDist(m) {
 
 // SAVE LOGIC
 function openSaveModal() {
+  const coords=getCurrentCoords(); if(!coords || !FaltGeo.validateCoords(...coords))return toast('Ingen aktuell position att spara.');
+  saveSnapshot={coords:[...coords],source,accuracy:source==='gps'?gpsAcc:null,timestamp:source==='gps'?gpsTimestamp:Date.now()};
+  document.getElementById('saveSnapshot').textContent=`${coordsText(coords)} · ${source==='gps'?'GPS ±'+Math.ceil(gpsAcc)+' m':'Vald kartpunkt'}. Punkten är låst medan du namnger den.`;
   document.getElementById('ptName').value = '';
   document.getElementById('ptTag').value = '';
   document.getElementById('saveModalOverlay').classList.add('visible');
@@ -658,24 +677,26 @@ function openSaveModal() {
 
 function closeSaveModal() {
   document.getElementById('saveModalOverlay').classList.remove('visible');
+  saveSnapshot=null;document.getElementById('saveButton').focus();
 }
 
 function savePoint() {
   const name = document.getElementById('ptName').value.trim() || 'Namnlös Punkt';
   const tag = document.getElementById('ptTag').value.trim();
-  const coords = getCurrentCoords();
-  
+  if(!saveSnapshot || !FaltGeo.validateCoords(...saveSnapshot.coords))return;
+  const coords=saveSnapshot.coords;
   const pt = {
-    id: Date.now().toString(),
+    id: typeof crypto.randomUUID==='function'?crypto.randomUUID():Date.now().toString()+'-'+Math.random().toString(36).slice(2),
     name,
     tag,
     lat: coords[0],
     lng: coords[1],
-    date: new Date().toISOString()
+    date: new Date(saveSnapshot.timestamp).toISOString(),
+    source:saveSnapshot.source, accuracy:saveSnapshot.accuracy
   };
   
   points.push(pt);
-  persistPoints();
+  if(!persistPoints()){points.pop();return;}
   closeSaveModal();
   toast('📍 Position sparad');
   
@@ -689,18 +710,18 @@ function renderMarkers() {
   points.forEach(p => {
     const marker = L.circleMarker([p.lat, p.lng], {
       radius: 8, color: '#fff', fillColor: '#3b82f6', fillOpacity: 0.9, weight: 1.5
-    }).bindPopup(`<b>${p.name}</b><br>${p.tag ? `<span class="pt-tag">${p.tag}</span>` : ''}`);
+    }).bindPopup(`<b>${escapeHTML(p.name)}</b><br>${p.tag ? `<span class="pt-tag">${escapeHTML(p.tag)}</span>` : ''}`);
     pointLayer.addLayer(marker);
   });
 }
 
 // LIST DRAWER
 function openDrawer() {
-  document.getElementById('listDrawer').classList.add('open');
+  document.getElementById('listDrawer').inert=false;document.getElementById('listDrawer').classList.add('open');document.getElementById('listDrawer').focus();
   renderList();
 }
 function closeDrawer() {
-  document.getElementById('listDrawer').classList.remove('open');
+  document.getElementById('listDrawer').classList.remove('open');document.getElementById('listDrawer').inert=true;document.querySelector('[onclick="openDrawer()"]').focus();
 }
 
 function setSort(mode) {
@@ -720,24 +741,24 @@ function renderList() {
   let items = getDistances(points);
 
   if (sortBy === 'time') {
-    items.sort((a,b) => b.id.localeCompare(a.id)); // newest first
+    items.sort((a,b) => (Date.parse(b.date)||0)-(Date.parse(a.date)||0)); // newest first
   } else {
     items.sort((a,b) => a.dist - b.dist); // closest first
   }
 
-  const isGpsStr = (gpsOn && gpsPos) ? '📍' : '🎯 Karta';
+  const isGpsStr = gpsFresh() ? '📍 GPS' : '🎯 Karta';
 
   let html = '';
   items.forEach(p => {
     html += `
       <div class="pt-card">
         <div class="pt-header">
-          <div class="pt-name">${p.name}</div>
+          <div class="pt-name">${escapeHTML(p.name)}</div>
           <div class="pt-dist" title="Avstånd från ${isGpsStr}">⛕ ${formatDist(p.dist)}</div>
         </div>
         <div class="pt-info">
           <div class="pt-coords">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</div>
-          ${p.tag ? `<div class="pt-tag">${p.tag}</div>` : ''}
+          ${p.tag ? `<div class="pt-tag">${escapeHTML(p.tag)}</div>` : ''}
         </div>
         <div class="pt-actions">
           <button class="pt-btn nav" onclick="navTo('${p.id}')">Visa på karta</button>
@@ -752,6 +773,7 @@ function renderList() {
 function navTo(id) {
   const p = points.find(x => x.id === id);
   if (p) {
+    source='center';setSource('center');
     map.setView([p.lat, p.lng], 17);
     closeDrawer();
   }
@@ -759,8 +781,8 @@ function navTo(id) {
 
 function delPoint(id) {
   if(confirm('Är du säker på att du vill radera denna position?')) {
-    points = points.filter(x => x.id !== id);
-    persistPoints();
+    const previous=points;points = points.filter(x => x.id !== id);
+    if(!persistPoints()){points=previous;return;}
     if(document.getElementById('listDrawer').classList.contains('open')) renderList();
     renderMarkers();
     toast('Position raderad');
@@ -774,17 +796,11 @@ function updateUI() {
 }
 
 function exportTSV() {
-  if(points.length === 0) return toast('Inget att exportera');
-  let tsv = "Namn\tTagg\tLatitud\tLongitud\tDatum\n";
-  points.forEach(p => {
-    tsv += `${p.name}\t${p.tag||''}\t${p.lat}\t${p.lng}\t${p.date}\n`;
-  });
-  const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Faltpunkter_Export_${new Date().toISOString().slice(0,10)}.tsv`;
-  a.click();
+  if(!points.length)return toast('Inget att exportera');
+  const cell=v=>{let t=String(v??'').replace(/[\t\r\n]/g,' ');return /^[=+@-]/.test(t)?"'"+t:t;};
+  const rows=[['Namn','Tagg','Latitud','Longitud','Datum','Källa','Noggrannhet m'],...points.map(p=>[p.name,p.tag,p.lat,p.lng,p.date,p.source||'',p.accuracy??''])];
+  const blob=new Blob(['\uFEFF'+rows.map(row=>row.map(cell).join('\t')).join('\n')],{type:'text/tab-separated-values;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Faltpunkter_Export_${new Date().toISOString().slice(0,10)}.tsv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
 // TOAST
@@ -808,8 +824,8 @@ let rookLayer = null;
 loadPoints();
 updateDisplay();
 
-const GRID_URLS = ['data/astorp-grid-250m.geojson', '../../Deployments/gaia-tools/rakor/data/astorp-grid-250m.geojson'];
-const ROOK_URLS = ['data/rakobservations.json', '../../Deployments/gaia-tools/rakor/data/rakobservations.json'];
+const GRID_URLS = ['data/astorp-grid-250m.geojson'];
+const ROOK_URLS = ['data/rakobservations.json'];
 
 async function tryFetch(urls) {
   for (const url of urls) {
@@ -822,7 +838,7 @@ async function tryFetch(urls) {
 }
 
 function getCurrentRuta(lat, lng) {
-  if (!gridData || typeof turf === 'undefined') return null;
+  if (!FaltGeo.validateCoords(lat,lng) || !gridData || typeof turf === 'undefined') return null;
   // fast path
   if (currentRutaCache.id && currentRutaCache.lat !== null) {
      const d = haversine(currentRutaCache.lat, currentRutaCache.lng, lat, lng);
@@ -978,7 +994,7 @@ function renderGrid() {
         L.DomEvent.stopPropagation(e);
         const id = feature.properties.gridId;
         const currentCoords = getCurrentCoords();
-        const currentId = getCurrentRuta(currentCoords[0], currentCoords[1]);
+        const currentId = currentCoords ? getCurrentRuta(currentCoords[0], currentCoords[1]) : null;
         
         if (id === currentId || selectedRutaId === id) {
           selectedRutaId = null;
@@ -1087,7 +1103,7 @@ function renderRookOverlay() {
         L.DomEvent.stopPropagation(e);
         const id = feature.properties.gridId;
         const currentCoords = getCurrentCoords();
-        const currentId = getCurrentRuta(currentCoords[0], currentCoords[1]);
+        const currentId = currentCoords ? getCurrentRuta(currentCoords[0], currentCoords[1]) : null;
         
         if (id === currentId || selectedRutaId === id) {
           selectedRutaId = null;
@@ -1211,6 +1227,16 @@ window.zoomGrid = function(level, targetId) {
     map.closePopup();
 };
 
+document.addEventListener('keydown',event=>{
+  const modal=document.getElementById('saveModalOverlay').classList.contains('visible')?document.querySelector('#saveModalOverlay .modal'):document.getElementById('listDrawer').classList.contains('open')?document.getElementById('listDrawer'):null;
+  if(!modal)return;
+  if(event.key==='Escape'){event.preventDefault();if(saveSnapshot)closeSaveModal();else closeDrawer();}
+  if(event.key==='Tab'){const nodes=[...modal.querySelectorAll('button,input,a,summary')].filter(e=>!e.disabled);const first=nodes[0],last=nodes.at(-1);if(event.shiftKey && (document.activeElement===first||document.activeElement===modal)){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
+});
+if('serviceWorker' in navigator && window.isSecureContext){
+  navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{document.getElementById('offlineStatus').textContent='Appens kärna är sparad för användning utan nät. Bakgrundskartor kräver nät.';}).catch(()=>{document.getElementById('offlineStatus').textContent='Offlinekopian kunde inte förberedas. Använd sidan med nätanslutning.';});
+}else{document.getElementById('offlineStatus').textContent='Offlinekopiering stöds inte i den här webbläsaren.';}
 </script>
 </body>
 </html>
+

@@ -13,6 +13,8 @@
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/turf.min.js"></script>
 <script src="geo.js"></script>
+<script src="import.js"></script>
+<script>if(location.search||location.hash)history.replaceState(null,'',location.pathname);</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -253,6 +255,7 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
 @media (min-width:900px){#map{height:48dvh;min-height:300px}.crosshair{top:max(150px,24dvh)}.right-controls{top:10px}.coord-panel{padding-top:20px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
+.import-preview{font-size:.8rem;line-height:1.5;max-height:32dvh;overflow:auto;overflow-wrap:anywhere}.import-preview p{margin:8px 0;border-bottom:1px solid var(--border);padding-bottom:7px}.import-error{color:#ffc0b5}#importFile{max-width:100%;margin:8px 0 12px}button[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -327,8 +330,8 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
       <p>Gräns: <a href="https://www.openstreetmap.org/relation/935517" target="_blank" rel="noopener noreferrer">OpenStreetMap, relation 935517</a>, © OpenStreetMap-bidragsgivare, <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL</a>. Befintlig projektfil från senast april 2026; exakt uttagsdatum saknas. Inte en juridisk gränsbestämning.</p>
       <p>”Spara” lagrar endast på den här enheten i webbläsaren. Exportera en säkerhetskopia innan du rensar webbplatsdata. Positionshistorik skickas inte till GitHub. Själva webbsidan är offentlig och GitHub hanterar vanliga åtkomstloggar.</p>
       <p>GPS behöver HTTPS och platsåtkomst. På iPhone: Inställningar → Integritet och säkerhet → Platstjänster och tillåt exakt plats för webbläsaren. Du kan lägga sidan på hemskärmen via Dela. Appens kärna blir tillgänglig utan nät efter en lyckad inläsning; bakgrundskartor kräver nät.</p>
-      <p id="offlineStatus">Offlinekopian förbereds vid första besöket.</p>
-      <p>Version 2026-11-07 · <a href="https://github.com/hktcr/FaltPunkter" target="_blank" rel="noopener noreferrer">Källkod</a></p>
+      <button id="updateButton" class="list-btn" hidden onclick="activateUpdate()">Installera uppdatering och ladda om</button><p id="offlineStatus" role="status">Offlinekopian förbereds vid första besöket.</p>
+      <p>Version 2026-11-07.2 · <a href="https://github.com/hktcr/FaltPunkter" target="_blank" rel="noopener noreferrer">Källkod</a></p>
     </details>
   </main>
 </div>
@@ -347,7 +350,12 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
     <!-- Items go here -->
   </div>
   <div style="padding:16px; border-top:1px solid var(--border)">
-    <button class="list-btn" onclick="exportTSV()" style="color:var(--accent);border-color:var(--border)">📥 Exportera data (TSV)</button>
+    <div class="quick-actions">
+      <button onclick="exportTSV()">Exportera TSV</button>
+      <button onclick="openImport()">Importera TSV</button>
+    </div>
+    <button class="list-btn" id="restoreImportButton" onclick="restoreImport()" hidden>Ångra senaste importen</button>
+    <p class="save-note" id="importStorageNote"></p>
   </div>
 </section>
 
@@ -370,6 +378,19 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
   </div>
 </div>
 
+<div class="modal-overlay" id="importOverlay">
+  <section class="modal center" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <h3 id="importTitle">Återimportera sparade punkter</h3>
+    <p class="save-note">Filen läses bara på din enhet. Befintliga punkter skrivs aldrig över. Dubbletter hoppas över. Alla fel måste rättas innan import.</p>
+    <label class="save-note" for="importFile">Välj en FältPunkter-export (TSV)</label>
+    <input type="file" id="importFile" accept=".tsv,text/tab-separated-values,text/plain" onchange="previewImport(this.files[0])">
+    <p id="importSummary" class="save-note" role="status">Ingen fil vald.</p>
+    <div id="importPreview" class="import-preview"></div>
+    <p class="save-note">En återställningspunkt sparas för den senaste importen. Den ersätter föregående importåterställningspunkt. Exportera först om du vill behålla en separat säkerhetskopia.</p>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeImport()">Avbryt import</button><button class="btn-save" id="commitImportButton" onclick="commitImport()" disabled>Lägg till punkter</button></div>
+  </section>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -390,6 +411,11 @@ let gpsGeneration = 0;
 let saveSnapshot = null;
 let storageBlocked = false;
 let storageRaw = null;
+let importPreview = null;
+let importGeneration=0;
+let importBusy=false;
+let waitingWorker=null;
+let reloadForUpdate=false;
 let tapPos = null;
 let points = [];
 let sortBy = 'time'; // 'time' | 'dist'
@@ -454,19 +480,22 @@ function loadPoints() {
       const data = JSON.parse(raw);
       if (!Array.isArray(data) || data.some(p => !p || !FaltGeo.validateCoords(p.lat,p.lng) || typeof p.id !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(p.id) || typeof p.name !== 'string' || (p.tag != null && typeof p.tag !== 'string'))) throw new Error('Invalid saved data');
       points = data;
-    }
+    } else {points=[];}
+    storageBlocked=false;
   } catch (_) { storageBlocked = true; toast('Sparade data kunde inte läsas. Inget skrivs över.'); }
   updateUI();
 }
 function persistPoints() {
-  if (storageBlocked) { toast('Lagringen är blockerad för att skydda befintliga data.'); return false; }
+  if(storageBlocked){toast('Lagringen är blockerad för att skydda befintliga data.');return false;}
   try {
     if(localStorage.getItem('faltpunkter_db')!==storageRaw){toast('Data har ändrats i en annan flik. Ladda om innan du sparar.');return false;}
-    const next=JSON.stringify(points);localStorage.setItem('faltpunkter_db',next);storageRaw=next;updateUI();return true;
-  }
-  catch (_) { toast('Kunde inte spara på enheten. Lagringen kan vara full eller avstängd.'); return false; }
+    const next=JSON.stringify(points);localStorage.setItem('faltpunkter_db',next);storageRaw=next;
+  } catch(_){toast('Kunde inte spara på enheten. Lagringen kan vara full eller avstängd.');return false;}
+  // A rendering failure must never roll back a successfully persisted point in memory.
+  try{updateUI();}catch(_){toast('Punkterna sparades, men vyn kunde inte uppdateras. Ladda om sidan.');}
+  return true;
 }
-window.addEventListener('storage',event=>{if(event.key==='faltpunkter_db'){if(saveSnapshot){toast('En annan flik ändrade sparade punkter. Stäng dialogen och ladda om.');}else{loadPoints();renderList();updateDisplay();}}});
+window.addEventListener('storage',event=>{if(event.key==='faltpunkter_db'){if(saveSnapshot||importPreview){toast('En annan flik ändrade sparade punkter. Stäng dialogen och ladda om.');}else{loadPoints();renderList();updateDisplay();}}});
 function escapeHTML(value) { return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function gpsFresh() { return !!gpsPos && Number.isFinite(gpsTimestamp) && Date.now()-gpsTimestamp <= 30000 && Date.now()-gpsTimestamp >= -5000; }
 function getCurrentCoords() {
@@ -680,7 +709,11 @@ function closeSaveModal() {
   saveSnapshot=null;document.getElementById('saveButton').focus();
 }
 
-function savePoint() {
+async function savePoint() {
+  try{return await withPointLock(()=>savePointLocked());}catch(error){toast(error.message);}
+}
+function savePointLocked() {
+  if(points.length>=FaltImport.LIMITS.rows)return toast('Högst 10 000 punkter kan sparas. Exportera och frigör utrymme först.');
   const name = document.getElementById('ptName').value.trim() || 'Namnlös Punkt';
   const tag = document.getElementById('ptTag').value.trim();
   if(!saveSnapshot || !FaltGeo.validateCoords(...saveSnapshot.coords))return;
@@ -695,6 +728,7 @@ function savePoint() {
     source:saveSnapshot.source, accuracy:saveSnapshot.accuracy
   };
   
+  try{FaltImport.exportTSV([...points,pt]);}catch(error){return toast('Punkten sparades inte: '+error.message);}
   points.push(pt);
   if(!persistPoints()){points.pop();return;}
   closeSaveModal();
@@ -717,6 +751,7 @@ function renderMarkers() {
 
 // LIST DRAWER
 function openDrawer() {
+  refreshImportRecovery();
   document.getElementById('listDrawer').inert=false;document.getElementById('listDrawer').classList.add('open');document.getElementById('listDrawer').focus();
   renderList();
 }
@@ -779,7 +814,10 @@ function navTo(id) {
   }
 }
 
-function delPoint(id) {
+async function delPoint(id) {
+  try{return await withPointLock(()=>deletePointLocked(id));}catch(error){toast(error.message);}
+}
+function deletePointLocked(id) {
   if(confirm('Är du säker på att du vill radera denna position?')) {
     const previous=points;points = points.filter(x => x.id !== id);
     if(!persistPoints()){points=previous;return;}
@@ -795,12 +833,72 @@ function updateUI() {
   renderMarkers();
 }
 
-function exportTSV() {
-  if(!points.length)return toast('Inget att exportera');
-  const cell=v=>{let t=String(v??'').replace(/[\t\r\n]/g,' ');return /^[=+@-]/.test(t)?"'"+t:t;};
-  const rows=[['Namn','Tagg','Latitud','Longitud','Datum','Källa','Noggrannhet m'],...points.map(p=>[p.name,p.tag,p.lat,p.lng,p.date,p.source||'',p.accuracy??''])];
-  const blob=new Blob(['\uFEFF'+rows.map(row=>row.map(cell).join('\t')).join('\n')],{type:'text/tab-separated-values;charset=utf-8'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Faltpunkter_Export_${new Date().toISOString().slice(0,10)}.tsv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+function downloadText(text,name){const blob=new Blob([text],{type:'text/tab-separated-values;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function exportTSV(){if(!points.length)return toast('Inget att exportera');try{downloadText(FaltImport.exportTSV(points),`Faltpunkter_Export_${new Date().toISOString().slice(0,10)}.tsv`);}catch(error){toast('Export stoppad: '+error.message);}}
+function withPointLock(action){if(!navigator.locks?.request)return Promise.reject(Error('Den här webbläsaren saknar säkert skrivlås. Använd en uppdaterad webbläsare för att spara eller importera.'));return navigator.locks.request('faltpunkter-points',action);}
+function openImport(){
+  if(storageBlocked)return toast('Befintliga data kunde inte läsas. Import får inte skriva över dem.');
+  importGeneration++;importPreview=null;document.getElementById('importFile').value='';document.getElementById('importSummary').textContent='Ingen fil vald.';document.getElementById('importPreview').replaceChildren();document.getElementById('commitImportButton').disabled=true;
+  document.getElementById('importOverlay').classList.add('visible');document.getElementById('importFile').focus();
+}
+function closeImport(){if(importBusy)return;importGeneration++;importPreview=null;document.getElementById('importOverlay').classList.remove('visible');document.querySelector('[onclick="openImport()"]').focus();}
+async function previewImport(file){
+  if(importBusy)return;
+  const generation=++importGeneration;importPreview=null;const summary=document.getElementById('importSummary'),preview=document.getElementById('importPreview'),button=document.getElementById('commitImportButton');button.disabled=true;preview.replaceChildren();
+  if(!file){summary.textContent='Ingen fil vald.';return;}
+  if(file.size>FaltImport.LIMITS.bytes){summary.textContent='Filen är för stor. Högst '+Math.round(FaltImport.LIMITS.bytes/1024)+' kB tillåts.';return;}
+  summary.textContent='Läser och kontrollerar filen…';
+  try{
+    const text=await file.text();if(generation!==importGeneration)return;
+    const before=localStorage.getItem('faltpunkter_db');if(before!==storageRaw)throw Error('Punkterna har ändrats i en annan flik. Stäng dialogen och ladda om.');
+    const plan=FaltImport.planImport(FaltImport.parseTSV(text),points);
+    try{FaltImport.exportTSV([...points,...plan.additions]);}catch(error){plan.errors.push({row:0,message:'Den samlade listan kan inte säkerhetskopieras: '+error.message});}
+    importPreview={plan,before};
+    summary.textContent=`${plan.additions.length} nya punkter · ${plan.duplicates.length} dubbletter · ${plan.errors.length} fel. `+(plan.errors.length?'Rätta felen och välj filen på nytt.':'Kontrollera punkterna innan du fortsätter.');
+    const lines=[...plan.errors.map(e=>({error:true,text:`Rad ${e.row}: ${e.message}`})),...plan.additions.map(p=>({text:`Ny: ${p.name} · ${p.lat}, ${p.lng} · ${p.date}`})),...plan.duplicates.map(d=>({text:`Dubblett, hoppas över (rad ${d.row}): ${d.point.name}`}))];
+    for(const line of lines.slice(0,100)){const row=document.createElement('p');row.textContent=line.text;if(line.error)row.className='import-error';preview.appendChild(row);}
+    if(lines.length>100){const note=document.createElement('p');note.textContent=`Visar 100 av ${lines.length} granskade rader.`;preview.appendChild(note);}
+    button.textContent=`Lägg till ${plan.additions.length} punkter`;
+    button.disabled=plan.fatal||plan.errors.length>0||plan.additions.length===0;
+  }catch(error){importPreview=null;summary.textContent=error.message||'Filen kunde inte läsas. Inget har sparats.';}
+}
+async function commitImport(){
+  if(importBusy||!importPreview||importPreview.plan.fatal||importPreview.plan.errors.length||!importPreview.plan.additions.length)return;
+  const approvedPreview=importPreview;
+  importBusy=true;document.getElementById('importFile').disabled=true;document.getElementById('commitImportButton').disabled=true;
+  try{await withPointLock(()=>{
+    const {before,plan}=approvedPreview;
+    if(storageBlocked||localStorage.getItem('faltpunkter_db')!==before)throw Error('Punkterna har ändrats sedan förhandsgranskningen. Inget importerades. Ladda om och försök igen.');
+    FaltImport.exportTSV([...points,...plan.additions]);
+    const additions=plan.additions.map(p=>({...p,id:crypto.randomUUID()}));const next=[...points,...additions];const after=JSON.stringify(next);
+    // A failed backup or point write never removes or replaces the current collection.
+    const backup={version:1,before,after,created:new Date().toISOString(),added:additions.length};
+    const previousBackup=readImportBackup();
+    // Keep a still-usable previous recovery point if the following DB write fails.
+    const journal=previousBackup&&previousBackup.after===before?[previousBackup,backup]:[backup];
+    localStorage.setItem('faltpunkter_import_backup',JSON.stringify(journal));
+    localStorage.setItem('faltpunkter_db',after);
+    points=next;storageRaw=after;
+    try{updateUI();renderList();}catch(_){toast('Importen sparades. Ladda om om vyn inte uppdateras.');}
+    toast(`${additions.length} punkter importerade. Befintliga punkter är kvar.`);
+  });importBusy=false;document.getElementById('importFile').disabled=false;closeImport();refreshImportRecovery();}
+  catch(error){importBusy=false;document.getElementById('importFile').disabled=false;document.getElementById('importSummary').textContent=error.message==='QuotaExceededError'?'Lagringen är full. Inget importerades.':error.message||'Import kunde inte sparas. Inget importerades.';document.getElementById('commitImportButton').disabled=true;refreshImportRecovery();}
+}
+function readImportBackup(){
+  try{const raw=JSON.parse(localStorage.getItem('faltpunkter_import_backup'));const list=(Array.isArray(raw)?raw:[raw]).filter(b=>b&&b.version===1&&(b.before===null||typeof b.before==='string')&&typeof b.after==='string'&&Number.isInteger(b.added)&&b.added>0);
+    const current=localStorage.getItem('faltpunkter_db');return list.findLast(b=>b.after===current)||list.at(-1)||null;
+  }catch(_){return null;}
+}
+function refreshImportRecovery(){const b=readImportBackup();document.getElementById('restoreImportButton').hidden=!b;document.getElementById('importStorageNote').textContent=b?'Senaste importen har en lokal återställningspunkt. Ångra är möjligt så länge inga senare punktändringar har gjorts.':'';}
+async function restoreImport(){
+  const b=readImportBackup();if(!b)return toast('Ingen återställningspunkt finns.');
+  if(!confirm(`Ångra senaste importen av ${b.added} punkter? Ursprungliga punkter återställs. Senare ändringar skrivs aldrig över.`))return;
+  try{await withPointLock(()=>{
+    if(localStorage.getItem('faltpunkter_db')!==b.after)throw Error('Punkterna har ändrats efter importen. Återställningen stoppades för att bevara dem.');
+    if(b.before!==null){const original=JSON.parse(b.before);if(!Array.isArray(original)||original.some(p=>!p||!FaltGeo.validateCoords(p.lat,p.lng)||typeof p.id!=='string'||!/^[a-zA-Z0-9_-]+$/.test(p.id)||typeof p.name!=='string'||(p.tag!=null&&typeof p.tag!=='string')))throw Error('Återställningspunkten är skadad. Nuvarande punkter lämnas orörda.');}
+    if(b.before===null)localStorage.removeItem('faltpunkter_db');else localStorage.setItem('faltpunkter_db',b.before);
+    loadPoints();renderList();updateDisplay();toast('Importen är ångrad. Ursprungliga punkter är återställda.');
+  });}catch(error){toast(error.message||'Återställningen misslyckades. Data är kvar.');}
 }
 
 // TOAST
@@ -1228,14 +1326,28 @@ window.zoomGrid = function(level, targetId) {
 };
 
 document.addEventListener('keydown',event=>{
-  const modal=document.getElementById('saveModalOverlay').classList.contains('visible')?document.querySelector('#saveModalOverlay .modal'):document.getElementById('listDrawer').classList.contains('open')?document.getElementById('listDrawer'):null;
+  const modal=document.getElementById('importOverlay').classList.contains('visible')?document.querySelector('#importOverlay .modal'):document.getElementById('saveModalOverlay').classList.contains('visible')?document.querySelector('#saveModalOverlay .modal'):document.getElementById('listDrawer').classList.contains('open')?document.getElementById('listDrawer'):null;
   if(!modal)return;
-  if(event.key==='Escape'){event.preventDefault();if(saveSnapshot)closeSaveModal();else closeDrawer();}
+  if(event.key==='Escape'){event.preventDefault();if(document.getElementById('importOverlay').classList.contains('visible'))closeImport();else if(saveSnapshot)closeSaveModal();else closeDrawer();}
   if(event.key==='Tab'){const nodes=[...modal.querySelectorAll('button,input,a,summary')].filter(e=>!e.disabled);const first=nodes[0],last=nodes.at(-1);if(event.shiftKey && (document.activeElement===first||document.activeElement===modal)){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
 });
+function showWaitingUpdate(worker){waitingWorker=worker;document.getElementById('updateButton').hidden=false;document.getElementById('offlineStatus').textContent='En komplett ny version är redo. Installera när du är klar med pågående dialoger.';}
+function pendingEditDialog(){return document.getElementById('saveModalOverlay').classList.contains('visible')||document.getElementById('importOverlay').classList.contains('visible')||importBusy;}
+function activateUpdate(){
+  if(pendingEditDialog()){toast('Avsluta spara- eller importdialogen innan du uppdaterar.');return;}
+  if(reloadForUpdate){location.reload();return;}
+  if(waitingWorker)waitingWorker.postMessage({type:'ACTIVATE_UPDATE'});
+}
 if('serviceWorker' in navigator && window.isSecureContext){
-  navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{document.getElementById('offlineStatus').textContent='Appens kärna är sparad för användning utan nät. Bakgrundskartor kräver nät.';}).catch(()=>{document.getElementById('offlineStatus').textContent='Offlinekopian kunde inte förberedas. Använd sidan med nätanslutning.';});
+  let reloading=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(waitingWorker&&!reloading){reloadForUpdate=true;if(pendingEditDialog()){document.getElementById('updateButton').hidden=false;document.getElementById('offlineStatus').textContent='En ny version har aktiverats. Avsluta dialogen och välj Installera uppdatering för att ladda om.';return;}reloading=true;location.reload();}});
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    if(reg.waiting)showWaitingUpdate(reg.waiting);
+    reg.addEventListener('updatefound',()=>{const installing=reg.installing;installing?.addEventListener('statechange',()=>{if(installing.state==='installed'&&navigator.serviceWorker.controller)showWaitingUpdate(installing);});});
+    return navigator.serviceWorker.ready;
+  }).then(()=>{if(!waitingWorker)document.getElementById('offlineStatus').textContent='Appens kärna är sparad för användning utan nät. Bakgrundskartor kräver nät.';}).catch(()=>{document.getElementById('offlineStatus').textContent='Offlinekopian kunde inte förberedas. Använd sidan med nätanslutning.';});
 }else{document.getElementById('offlineStatus').textContent='Offlinekopiering stöds inte i den här webbläsaren.';}
+
 </script>
 </body>
 </html>

@@ -18,7 +18,7 @@ function app(db={value:null}) {
     const classes=new Set();
     const node={value:'',textContent:'',innerHTML:'',style:{},dataset:{},disabled:false,
       classList:{add(...xs){xs.forEach(x=>classes.add(x));},remove(...xs){xs.forEach(x=>classes.delete(x));},contains(x){return classes.has(x);},toggle(x,on){if(on===undefined)on=!classes.has(x);on?classes.add(x):classes.delete(x);}},
-      setAttribute(){},addEventListener(){},focus(){document.activeElement=this;},select(){},setSelectionRange(){},querySelectorAll(){return [];},click(){}};
+      children:[],appendChild(child){this.children.push(child);},replaceChildren(){this.children=[];},setAttribute(){},addEventListener(){},focus(){document.activeElement=this;},select(){},setSelectionRange(){},querySelectorAll(){return [];},click(){}};
     elements.set(id,node);return node;
   }
   Object.assign(document,{getElementById:element,querySelector:s=>element(s),querySelectorAll:()=>[],addEventListener(){},createElement:()=>element('created')});
@@ -29,11 +29,11 @@ function app(db={value:null}) {
     control:{scale:layer},DomEvent:{stopPropagation(){}},popup:()=>Object.assign(layer(),{setLatLng(){return this;},setContent(){return this;},openOn(){return this;}}),
     geoJSON(data,options){for(const f of data?.features||[]){const l=layer();l.feature=f;featureLayers.push(l);options?.onEachFeature?.(f,l);}return layer();}};
   const window={isSecureContext:true,addEventListener:(name,cb)=>{windowEvents[name]=cb;}};
-  const context={window,document,L,FaltGeo:require('./geo.js'),turf:require('./vendor/turf.min.js'),
-    navigator:{geolocation:{watchPosition(ok,error){watches.push({ok,error});return watches.length;},clearWatch(){}}},
-    localStorage:{getItem:()=>db.value,setItem:(key,value)=>{if(db.fail)throw Error('Quota');db.value=value;}},
+  const context={window,document,L,FaltGeo:require('./geo.js'),FaltImport:require('./import.js'),location:{search:'',hash:''},history:{replaceState(){}},turf:require('./vendor/turf.min.js'),
+    navigator:{locks:{request:(_name,action)=>Promise.resolve().then(action)},geolocation:{watchPosition(ok,error){watches.push({ok,error});return watches.length;},clearWatch(){}}},
+    localStorage:{getItem:key=>key==='faltpunkter_db'?db.value:db[key]??null,setItem:(key,value)=>{if(db.fail||db.failKey===key)throw Error('Quota');if(key==='faltpunkter_db')db.value=value;else db[key]=value;},removeItem:key=>{if(key==='faltpunkter_db')db.value=null;else delete db[key];}},
     fetch:()=>new Promise(()=>{}),setTimeout:()=>0,clearTimeout(){},setInterval:cb=>{intervals.push(cb);return intervals.length;},
-    Date:class extends Date{static now(){return now;}},confirm:()=>true,console,Blob,URL,crypto:require('node:crypto').webcrypto};
+    Date:class extends Date{static now(){return now;}},confirm:()=>true,console,Blob,URL,TextEncoder,crypto:require('node:crypto').webcrypto};
   vm.createContext(context);vm.runInContext(code,context,{filename:'index.html'});
   return {context,map,element,intervals,removed,watches,featureLayers,windowEvents,db,run:s=>vm.runInContext(s,context),advance:ms=>{now+=ms;},fix(lat=56.13,lng=12.94,accuracy=5){watches.at(-1).ok({coords:{latitude:lat,longitude:lng,accuracy},timestamp:now});}};
 }
@@ -50,10 +50,10 @@ test('two tabs cannot overwrite each other’s stored points',()=>{
  assert.equal(b.run("points.push({id:'3',name:'B',lat:56,lng:13});persistPoints();"),false);
  assert.equal(db.value,saved);assert.ok(JSON.parse(db.value).some(p=>p.id==='2'));
 });
-test('malformed legacy data and quota failure do not destroy existing data',()=>{
+test('malformed legacy data and quota failure do not destroy existing data',async()=>{
  const bad={value:'{broken'},a=app(bad);assert.equal(a.run('persistPoints()'),false);assert.equal(bad.value,'{broken');
  const db={value:JSON.stringify([validPoint])},b=app(db),before=db.value;db.fail=true;
- b.run("setSource('center');openSaveModal();savePoint();");
+ await b.run("setSource('center');openSaveModal();savePoint();");
  assert.equal(db.value,before);assert.equal(b.run('points.length'),1);assert.ok(b.run('saveSnapshot'));
 });
 test('tap source rejects invalid coordinates and wraps repeated map worlds',()=>{
@@ -61,9 +61,9 @@ test('tap source rejects invalid coordinates and wraps repeated map worlds',()=>
  a.map.events.click({latlng:{lat:56,lng:373,wrap(){return {lat:56,lng:13};}}});
  assert.equal(a.run('getCurrentCoords()[1]'),13);
 });
-test('GPS save snapshot is fixed while naming and survives later GPS movement',()=>{
+test('GPS save snapshot is fixed while naming and survives later GPS movement',async()=>{
  const a=app();a.run('centerOnGPS()');a.fix();a.run('openSaveModal()');a.advance(4000);a.fix(56.14,12.95,25);
- a.element('ptName').value='Snapshot';a.run('savePoint()');
+ a.element('ptName').value='Snapshot';await a.run('savePoint()');
  const p=JSON.parse(a.db.value)[0];assert.equal(p.lat,56.13);assert.equal(p.lng,12.94);assert.equal(p.accuracy,5);
  assert.equal(p.date,new Date(1800000000000).toISOString());
 });
@@ -99,4 +99,34 @@ test('aged GPS is neither copyable nor saveable and absent boundary stays unknow
  assert.equal(a.element('copyButton').disabled,true);
  assert.equal(a.element('saveButton').disabled,true);
  a.run('openSaveModal()');assert.equal(a.run('saveSnapshot'),null);
+});
+
+
+test('durable save survives UI error and subsequent save',async()=>{
+ const a=app({value:JSON.stringify([validPoint])});a.run("setSource('center');openSaveModal();var realUpdate=updateUI;updateUI=()=>{throw Error('render');};");a.element('ptName').value='Saved despite rendering';await a.run('savePoint()');
+ assert.equal(JSON.parse(a.db.value).length,2);assert.equal(a.run('points.length'),2);
+ a.run("updateUI=realUpdate;openSaveModal()");a.element('ptName').value='Next';await a.run('savePoint()');assert.equal(JSON.parse(a.db.value).length,3);
+});
+function preview(a,items){const source=require('./import.js').exportTSV(items);a.context.testTSV=source;return a.run("previewImport({size:new TextEncoder().encode(testTSV).length,text:async()=>testTSV})");}
+const imported={name:'Imported',tag:'',lat:56.14,lng:12.95,date:'2026-01-01T00:00:00Z',source:'gps',accuracy:4};
+test('import preview, duplicate filtering, append and exact undo',async()=>{
+ const raw=JSON.stringify([validPoint]),a=app({value:raw});await preview(a,[validPoint,imported,imported]);assert.equal(a.run('importPreview.plan.additions.length'),1);assert.equal(a.run('importPreview.plan.duplicates.length'),2);assert.equal(a.db.value,raw);
+ await a.run('commitImport()');assert.equal(JSON.parse(a.db.value).length,2);await a.run('restoreImport()');assert.equal(a.db.value,raw);
+});
+test('undo empty import clears memory and later save does not resurrect it',async()=>{
+ const a=app();await preview(a,[imported]);await a.run('commitImport()');await a.run('restoreImport()');assert.equal(a.db.value,null);assert.equal(a.run('points.length'),0);
+ a.run("setSource('center');openSaveModal()");a.element('ptName').value='New manual';await a.run('savePoint()');assert.deepEqual(JSON.parse(a.db.value).map(p=>p.name),['New manual']);
+});
+test('failed second import retains previous usable undo',async()=>{
+ const a=app();await preview(a,[imported]);await a.run('commitImport()');const first=a.db.value;await preview(a,[{...imported,name:'Second'}]);a.db.failKey='faltpunkter_db';await a.run('commitImport()');assert.equal(a.db.value,first);delete a.db.failKey;await a.run('restoreImport()');assert.equal(a.db.value,null);
+});
+test('changed points and corrupt recovery data are never overwritten',async()=>{
+ const a=app();await preview(a,[imported]);await a.run('commitImport()');a.db.value=JSON.stringify([validPoint]);const raw=a.db.value;await a.run('restoreImport()');assert.equal(a.db.value,raw);
+ a.db.faltpunkter_import_backup=JSON.stringify([{version:1,before:'{broken',after:raw,added:1}]);await a.run('restoreImport()');assert.equal(a.db.value,raw);
+});
+test('writes fail closed without Web Locks',async()=>{
+ const a=app();a.context.navigator.locks=undefined;a.run("setSource('center');openSaveModal()");await a.run('savePoint()');assert.equal(a.db.value,null);await preview(a,[imported]);await a.run('commitImport()');assert.equal(a.db.value,null);
+});
+test('manual save preserves exportability before writing',async()=>{
+ const a=app();a.context.FaltImport={...a.context.FaltImport,exportTSV:()=>{throw Error('Export limit');}};a.run("setSource('center');openSaveModal()");await a.run('savePoint()');assert.equal(a.db.value,null);assert.equal(a.run('points.length'),0);
 });

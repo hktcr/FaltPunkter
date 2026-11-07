@@ -1,0 +1,31 @@
+name: Test FältPunkter
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  browser-and-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit and regression tests
+        run: node --test geo.test.cjs app.test.cjs import.test.cjs
+      - name: Install browser test dependency
+        run: npm install --no-save --ignore-scripts playwright@1.62.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser offline, update, import and mobile tests
+        run: node browser.test.cjs
+      - name: Save synthetic test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-screenshots
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7

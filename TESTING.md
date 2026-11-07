@@ -10,6 +10,8 @@ Oberoende kodgranskning har genomförts. Identifierade fel i backup, flera flika
 
 ## Riktiga webbläsartester
 
-`node browser.test.cjs` startar en lokal HTTP-server och riktig Chromium. Sviten är förberedd för GitHub Actions men har ännu inte körts vid denna lokala revision. Den ska verifiera initial offlineinstallation, nätavbrott, frågesträng utan vidarebefordran, HTTP 503, fördröjning, avstannad svarskropp, misslyckad och lyckad uppdatering, öppna dialoger i annan flik, TSV-import/återställning/kvotfel samt 320, 390, 844 och 1440 px skärmbredder.
+`node browser.test.cjs` startar en lokal HTTP-server och riktig Chromium. Sviten har körts i GitHub Actions: **18 av 18 scenarier godkända**, jämte samtliga 38 enhetstester, på commit `e2e2e79052f1f00e661906e14f48abe011b93eb2`. [Verifierad körning](https://github.com/hktcr/FaltPunkter/actions/runs/42399787529). Den verifierade initial offlineinstallation, nätavbrott, frågesträng utan vidarebefordran, HTTP 503, fördröjning, avstannad svarskropp, misslyckad och lyckad uppdatering, öppna dialoger i annan flik, TSV-import/återställning/kvotfel samt 320, 390, 844 och 1440 px skärmbredder.
 
 Sviten använder enbart syntetiska koordinater och isolerade webbläsarkontexter. Fysisk GPS, Safari/iOS, Android och kommungränsens juridiska riktighet är fortfarande separata begränsningar.
+
+Skärmbilder från körningen har granskats. Mobiltestet har därefter utökats med förhandsgranskning och avbrytande av import på alla fyra skärmstorlekarna samt separata bilder för startsidan, knapparna och importdialogen. GitHub Actions testar även denna utökade version innan publicering.

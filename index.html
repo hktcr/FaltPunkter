@@ -279,6 +279,8 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
 @media(min-width:760px){.map-first.map-wrap{grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:auto auto minmax(190px,1fr) auto;height:100dvh;min-height:390px}.map-first .app-bar,.map-first .map-toolbar{grid-column:1 / -1}.map-first .map-stage{grid-column:1;grid-row:3}.map-first .map-caption{grid-column:1;grid-row:4}.map-first .map-dock{grid-column:2;grid-row:3 / 5;overflow:auto;padding:16px}.map-first .map-copy-row{flex-direction:column}}
 @media(max-width:759px) and (max-height:500px) and (orientation:landscape){.map-first.map-wrap{grid-template-columns:minmax(0,1fr) 285px;grid-template-rows:auto auto minmax(170px,1fr) auto;height:100dvh;min-height:390px}.map-first .app-bar,.map-first .map-toolbar{grid-column:1 / -1}.map-first .map-stage{grid-column:1;grid-row:3}.map-first .map-caption{grid-column:1;grid-row:4}.map-first .map-dock{grid-column:2;grid-row:3 / 5;overflow:auto;padding:8px}.map-first .map-copy-row{flex-direction:column}}
 @media(max-width:380px){.app-brand{font-size:.95rem}.view-switch button{padding:6px 10px}.map-toolbar{gap:5px;padding:6px 8px}.map-toolbar button,.map-toolbar summary{font-size:.72rem;padding:8px}.map-toolbar details{margin-left:0}.map-first .c-digits{font-size:1.3rem}}
+/* One document scroll container: avoid clipping compact controls on small screens. */
+html{height:100%;overflow:auto;display:block}body{min-height:100%;height:auto;overflow:visible;display:block}
 </style>
 </head>
 <body>

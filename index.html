@@ -13,6 +13,7 @@
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/turf.min.js"></script>
 <script src="geo.js"></script>
+<script src="map-geometry.js"></script>
 <script src="import.js"></script>
 <script>if(location.search||location.hash)history.replaceState(null,'',location.pathname);</script>
 <style>
@@ -256,27 +257,65 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .import-preview{font-size:.8rem;line-height:1.5;max-height:32dvh;overflow:auto;overflow-wrap:anywhere}.import-preview p{margin:8px 0;border-bottom:1px solid var(--border);padding-bottom:7px}.import-error{color:#ffc0b5}#importFile{max-width:100%;margin:8px 0 12px}button[hidden]{display:none!important}
+
+/* Two views share one source, one status and one set of safe copy/save actions. */
+.app-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:#0b201b;border-bottom:1px solid #345048;min-height:60px}
+.app-brand{color:#edfff7;font-weight:800;font-size:1.05rem;letter-spacing:.01em}
+.view-switch{display:flex;gap:3px;background:#081713;border:1px solid #426255;border-radius:12px;padding:3px}
+.view-switch button{min-height:40px;padding:6px 13px;font:700 .85rem var(--sans);border:0;border-radius:8px;background:transparent;color:#b8cdbf;cursor:pointer}
+.view-switch button[aria-pressed="true"]{background:#b7efd3;color:#092b1e}
+.map-toolbar{position:relative;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:7px 12px;background:#10271f;z-index:1100}
+.map-toolbar button,.map-toolbar summary{min-height:42px;padding:8px 10px;border:1px solid #567364;border-radius:9px;background:#183c2e;color:#e4f7eb;font:600 .8rem var(--sans);cursor:pointer}
+.map-toolbar button[aria-pressed="true"]{background:#b7efd3;color:#092b1e}
+.map-toolbar details{margin-left:auto}.map-toolbar summary{display:flex;align-items:center;gap:6px}.map-toolbar summary::after{content:'▾'}
+.map-toolbar .layers{position:absolute;top:100%;right:8px;max-width:calc(100vw - 16px);width:330px;padding:12px;background:#10271f;border:1px solid #567364;border-radius:12px;box-shadow:0 10px 30px #0009;justify-content:flex-start}
+.map-toolbar .layers p{font-size:.8rem;line-height:1.5;color:#c7dace;margin-bottom:6px}.map-toolbar .layer-pill{min-height:44px;background:#193a31}.map-toolbar .layer-pill.active{background:#b7efd3;color:#092b1e}
+.map-stage{position:relative;flex:none;min-width:0}.crosshair{top:50%}.right-controls{top:auto;bottom:24px;right:10px;max-width:none}.right-controls .zoom-btns{flex-direction:column}.center-btn{width:44px;height:44px}
+.gps-badge{max-width:calc(100% - 20px);top:10px;left:10px;padding:8px 12px}.gps-text{font-size:.72rem}
+.map-caption{margin:0;padding:5px 12px;background:#10271f;color:#c5d9cc;font-size:.74rem;line-height:1.4}
+.astorp-badge{display:flex;align-items:center;gap:9px}.boundary-symbol{display:inline-flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;border-radius:50%;background:#16613b;color:#fff;border:2px solid #74e5a4;font-size:1rem}.out .boundary-symbol{background:#a52130;border-color:#ff9da6}.uncertain .boundary-symbol{background:#835b06;border-color:#ffdc87}.unknown .boundary-symbol{background:#43546b;border-color:#bdccdf}
+.map-dock{display:none;background:#0b1419;padding:8px 12px max(10px,env(safe-area-inset-bottom));min-width:0}.map-dock .coord-source{margin-bottom:6px}.map-dock .source-pill{min-height:40px;padding:7px 10px;text-transform:none}.map-dock .astorp-badge{font-size:.88rem;padding:7px 10px}.map-dock .source-note{font-size:.76rem;margin:5px 0;line-height:1.4}.map-copy-row{display:flex;gap:7px;margin-top:7px}.map-copy-row input{min-width:0;font-size:.94rem;padding:9px}.map-copy-row button{flex:none;min-height:44px;padding:8px 12px;background:#b7efd3;color:#092b1e;border:0;border-radius:9px;font:700 .8rem var(--sans)}.map-dock summary{color:#b6f0da;padding:7px 0;cursor:pointer;font-size:.8rem}.map-dock .quick-actions{grid-template-columns:1fr 1fr;margin:8px 0}.map-dock .quick-actions button{min-height:44px;font-size:.8rem}.map-dock .boundary-detail{font-size:.78rem}
+.map-first.map-wrap{display:grid;grid-template-rows:auto auto minmax(190px,1fr) auto auto;height:100dvh;min-height:560px}.map-first .map-stage{min-height:0}.map-first #map{height:100%;min-height:0}.map-first .coord-panel{display:none}.map-first .map-dock{display:block}
+@media(min-width:760px){.map-first.map-wrap{grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:auto auto minmax(190px,1fr) auto;min-height:390px}.map-first .app-bar,.map-first .map-toolbar{grid-column:1 / -1}.map-first .map-stage{grid-column:1;grid-row:3}.map-first .map-caption{grid-column:1;grid-row:4}.map-first .map-dock{grid-column:2;grid-row:3 / 5;overflow:auto;padding:16px}.map-first .map-copy-row{flex-direction:column}}
+@media(max-width:759px) and (max-height:500px) and (orientation:landscape){.map-first.map-wrap{grid-template-columns:minmax(0,1fr) 285px;grid-template-rows:auto auto minmax(170px,1fr) auto;min-height:390px}.map-first .app-bar,.map-first .map-toolbar{grid-column:1 / -1}.map-first .map-stage{grid-column:1;grid-row:3}.map-first .map-caption{grid-column:1;grid-row:4}.map-first .map-dock{grid-column:2;grid-row:3 / 5;overflow:auto;padding:8px}.map-first .map-copy-row{flex-direction:column}}
+@media(max-width:380px){.app-brand{font-size:.95rem}.view-switch button{padding:6px 10px}.map-toolbar{gap:5px;padding:6px 8px}.map-toolbar button,.map-toolbar summary{font-size:.72rem;padding:8px}.map-toolbar details{margin-left:0}.map-first .c-digits{font-size:1.3rem}}
 </style>
 </head>
 <body>
 
-<div class="map-wrap">
-  <div id="map"></div>
-  <div class="crosshair"><div class="ch-ring"></div><div class="ch-v"></div><div class="ch-h"></div><div class="ch-dot"></div></div>
-  <button class="gps-badge" id="gpsBadge" onclick="toggleGPS()" aria-pressed="false"><span class="gps-dot off" id="gpsDot"></span><span class="gps-text" id="gpsText">Starta GPS</span></button>
-  <div class="right-controls">
-    <div class="layers">
-      <button class="layer-pill active" data-layer="none">Privat vy</button><button class="layer-pill" data-layer="street">Karta</button>
-      <button class="layer-pill" data-layer="topowebb">Grön</button>
-      <button class="layer-pill" data-layer="terrain">Terr</button>
-      <button class="layer-pill" data-layer="satellite">Sat</button>
-    </div>
-    <button class="center-btn" onclick="centerOnGPS()" title="Visa min GPS-position" aria-label="Visa min GPS-position">🎯</button>
-    <div class="zoom-btns">
-      <button class="zoom-btn" onclick="map.zoomIn()" aria-label="Zooma in">+</button>
-      <button class="zoom-btn" onclick="map.zoomOut()" aria-label="Zooma ut">−</button>
-    </div>
+<div class="map-wrap" id="appLayout">
+  <header class="app-bar"><span class="app-brand">FältPunkter</span><div class="view-switch" role="group" aria-label="Visningsläge"><button id="fieldViewButton" aria-pressed="true" onclick="setViewMode('field')">Fältvy</button><button id="mapViewButton" aria-pressed="false" onclick="setViewMode('map')">Kartvy</button></div></header>
+  <div class="map-toolbar" role="group" aria-label="Kartverktyg">
+    <button id="fitBoundaryButton" onclick="fitMunicipality()" disabled>Visa Åstorp</button>
+    <button id="maskButton" onclick="toggleOutsideMask()" aria-pressed="false" disabled>Tona ned utanför</button>
+    <details id="backgroundMenu"><summary id="backgroundSummary">Bakgrund: privat</summary><div class="layers">
+      <p>Privat visar bara kommungränsen. Övriga bakgrunder skickar synligt kartområde och IP-adress till kartleverantören, efter ditt godkännande.</p>
+      <button class="layer-pill active" data-layer="none" aria-pressed="true">Privat</button><button class="layer-pill" data-layer="street" aria-pressed="false">Gatukarta</button>
+      <button class="layer-pill" data-layer="topowebb" aria-pressed="false">Grön</button><button class="layer-pill" data-layer="terrain" aria-pressed="false">Terräng</button><button class="layer-pill" data-layer="satellite" aria-pressed="false">Satellit</button>
+    </div></details>
   </div>
+  <section class="map-stage" aria-label="Karta över Åstorps kommun">
+    <div id="map" aria-label="Karta. Flytta med piltangenter och zooma med plus eller minus."></div>
+    <div class="crosshair" aria-hidden="true" style="display:none"><div class="ch-ring"></div><div class="ch-v"></div><div class="ch-h"></div><div class="ch-dot"></div></div>
+    <button class="gps-badge" id="gpsBadge" onclick="toggleGPS()" aria-pressed="false"><span class="gps-dot off" id="gpsDot"></span><span class="gps-text" id="gpsText">Starta GPS</span></button>
+    <div class="right-controls">
+      <button class="center-btn" onclick="centerOnGPS()" title="Visa min GPS-position" aria-label="Visa min GPS-position">🎯</button>
+      <div class="zoom-btns"><button class="zoom-btn" onclick="map.zoomIn()" aria-label="Zooma in">+</button><button class="zoom-btn" onclick="map.zoomOut()" aria-label="Zooma ut">−</button></div>
+    </div>
+  </section>
+  <p class="map-caption" id="mapCaption">Privat gränskarta · inga gatunamn eller externa kartbilder. Välj bakgrund för mer kartdetaljer.</p>
+
+  <section class="map-dock" aria-label="Koordinater i kartvy">
+    <div class="coord-source" role="group" aria-label="Koordinatkälla">
+      <button class="source-pill active" data-source="gps" aria-pressed="true" onclick="setSource('gps')">Min GPS</button>
+      <button class="source-pill" data-source="center" aria-pressed="false" onclick="setSource('center')">Kartmitt</button>
+      <button class="source-pill" data-source="tap" aria-pressed="false" onclick="setSource('tap')">Vald punkt</button>
+    </div>
+    <div id="mapStatus" class="astorp-badge unknown" role="status" aria-live="polite">Ingen GPS-position</div>
+    <p id="mapSourceNote" class="source-note"></p>
+    <div class="map-copy-row"><input id="mapCopyValue" class="copy-field" readonly value="" placeholder="Inväntar position" aria-label="WGS84 latitud, longitud att kopiera" onclick="this.select()"><button id="mapCopyButton" onclick="copyCoords()" disabled>Kopiera koordinater</button></div>
+    <details><summary>Precision, spara &amp; fler verktyg</summary><p class="source-note">WGS84 · latitud, longitud · decimalpunkt. Statusen gäller vald koordinatkälla. Gränsen är vägledande, inte juridiskt fastställd.</p><p id="mapBoundaryDetail" class="boundary-detail"></p><div class="quick-actions"><button id="mapSaveButton" onclick="openSaveModal();" disabled>Spara punkt</button><button id="mapListButton" onclick="openDrawer();">Sparade punkter</button><button onclick="centerOnGPS();">Hämta min position</button><button onclick="setViewMode('field')">Fler verktyg i Fältvy</button></div></details>
+  </section>
 
   <main class="coord-panel">
     <h1 class="field-heading">FältPunkter · Åstorps kommun</h1>
@@ -312,7 +351,7 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
       </button>
     </div>
 
-    <label class="source-note" for="copyValue">WGS84 · latitud, longitud · decimalpunkt</label>
+    <label class="source-note coordinate-format" for="copyValue">WGS84 · latitud, longitud · decimalpunkt</label>
     <input id="copyValue" class="copy-field" readonly value="" placeholder="Inväntar position" aria-label="Koordinater att kopiera" onclick="this.select()">
     <div class="quick-actions">
       <button class="primary" id="copyButton" onclick="copyCoords()" disabled>Kopiera koordinater</button>
@@ -325,13 +364,14 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
         <button class="overlay-pill rook-pill" id="btnRook" onclick="toggleRookOverlay()">🐦 Råkor</button>
       </div></details>
     <details class="privacy"><summary>Integritet, precision &amp; hjälp</summary>
+      <p>Växla mellan Fältvy och Kartvy högst upp. Kartvy ger större karta och kompakta koordinatknappar. ”Visa Åstorp” visar hela kommunen. ”Tona ned utanför” skuggar området utanför kartgränsen, även dess hål. Ingen bakgrund eller GPS startas av de valen. Grönt ✓ betyder innanför, rött × utanför, gult ! osäkert och grått ? att besked saknas. Statusen gäller den valda koordinatkällan. Kartans blå GPS-punkt med noggrannhetscirkel är separat från en lila vald punkt.</p>
       <p>GPS startar bara när du ber om det. Koordinater och gränskontroll behandlas i din webbläsare. Privat vy laddar inga externa kartbilder. Väljer du Karta, Grön, Terr eller Sat får kartleverantören din IP-adress och det kartområde du visar. Växla tillbaka till Privat vy för att stoppa nya kartanrop.</p>
       <p>En position blir aldrig helt exakt. ±-värdet är webbläsarens uppskattade noggrannhet. Nära gränsen visas ”Osäkert” när noggrannhetsradien plus en försiktighetsmarginal på 10 m når gränsen. Marginalen är inte en garanti för kartans riktighet.</p>
       <p>Gräns: <a href="https://www.openstreetmap.org/relation/935517" target="_blank" rel="noopener noreferrer">OpenStreetMap, relation 935517</a>, © OpenStreetMap-bidragsgivare, <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL</a>. Befintlig projektfil från senast april 2026; exakt uttagsdatum saknas. Inte en juridisk gränsbestämning.</p>
       <p>”Spara” lagrar endast på den här enheten i webbläsaren. Exportera en säkerhetskopia innan du rensar webbplatsdata. Positionshistorik skickas inte till GitHub. Själva webbsidan är offentlig och GitHub hanterar vanliga åtkomstloggar.</p>
       <p>GPS behöver HTTPS och platsåtkomst. På iPhone: Inställningar → Integritet och säkerhet → Platstjänster och tillåt exakt plats för webbläsaren. Du kan lägga sidan på hemskärmen via Dela. Appens kärna blir tillgänglig utan nät efter en lyckad inläsning; bakgrundskartor kräver nät.</p>
       <button id="updateButton" class="list-btn" hidden onclick="activateUpdate()">Installera uppdatering och ladda om</button><p id="offlineStatus" role="status">Offlinekopian förbereds vid första besöket.</p>
-      <p>Version 2026-11-07.2 · <a href="https://github.com/hktcr/FaltPunkter" target="_blank" rel="noopener noreferrer">Källkod</a></p>
+      <p>Version 2026-11-15.1 · <a href="https://github.com/hktcr/FaltPunkter" target="_blank" rel="noopener noreferrer">Källkod</a></p>
     </details>
   </main>
 </div>
@@ -398,6 +438,10 @@ button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,summary:focu
 const DEFAULT_CENTER = [56.1309, 12.9917];
 let astorpBoundary = null;
 let boundaryState = 'loading';
+let boundaryLayer = null;
+let outsideMask = null;
+let outsideDimmed = false;
+let viewMode = 'field';
 
 // STATE
 let source = 'gps';
@@ -425,7 +469,7 @@ let selectedRutaId = null;
 let waitingForGPSCenter = false;
 
 // MAP
-const map = L.map('map', { zoomControl: false, attributionControl: true }).setView(DEFAULT_CENTER, 14);
+const map = L.map('map', { zoomControl: false, attributionControl: true, worldCopyJump: true }).setView(DEFAULT_CENTER, 14);
 
 const tiles = {
   street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO' }),
@@ -442,12 +486,47 @@ map.attributionControl.addAttribution('Gräns © OpenStreetMap-bidragsgivare');
 document.querySelectorAll('.layer-pill').forEach(btn => {
   btn.addEventListener('click', function() {
     if (this.dataset.layer !== 'none' && !confirm('Bakgrundskartan skickar din IP-adress och området du visar till kartleverantören. Visa kartan?')) return;
-    document.querySelectorAll('.layer-pill').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
+    document.querySelectorAll('.layer-pill').forEach(b => {b.classList.toggle('active',b===this);b.setAttribute('aria-pressed',String(b===this));});
+    document.getElementById('backgroundSummary').textContent='Bakgrund: '+this.textContent.toLowerCase();
+    document.getElementById('backgroundMenu').open=false;
+    document.getElementById('mapCaption').textContent=this.dataset.layer==='none'?'Privat gränskarta · inga gatunamn eller externa kartbilder. Välj bakgrund för mer kartdetaljer.':'Bakgrund: '+this.textContent+' · externa kartanrop på. Gränsen är vägledande, inte juridiskt fastställd.';
     Object.values(tiles).forEach(t => map.removeLayer(t));
     if (tiles[this.dataset.layer]) tiles[this.dataset.layer].addTo(map);
   });
 });
+
+
+function setViewMode(mode) {
+  if(mode!=='map'&&mode!=='field')return;
+  const fromDock=!!document.activeElement?.closest?.('.map-dock');
+  viewMode=mode;
+  document.getElementById('appLayout').classList.toggle('map-first',mode==='map');
+  document.getElementById('fieldViewButton').setAttribute('aria-pressed',String(mode==='field'));
+  document.getElementById('mapViewButton').setAttribute('aria-pressed',String(mode==='map'));
+  map.invalidateSize({pan:false});
+  if(mode==='field'&&fromDock)document.getElementById('fieldViewButton').focus();
+  updateDisplay();
+}
+function fitMunicipality() {
+  if(boundaryState!=='ready'||!boundaryLayer)return;
+  map.fitBounds(boundaryLayer.getBounds(),{paddingTopLeft:[28,62],paddingBottomRight:[64,30],animate:false});
+}
+function toggleOutsideMask() {
+  if(boundaryState!=='ready')return;
+  try {
+    if(!outsideMask){
+      const geometry=FaltMap.outsideGeometry(astorpBoundary);
+      if(!geometry)throw Error('Mask geometry unavailable');
+      if(!map.getPane('outsideMask')){map.createPane('outsideMask');map.getPane('outsideMask').style.zIndex='350';map.getPane('outsideMask').style.pointerEvents='none';}
+      outsideMask=L.geoJSON(geometry,{pane:'outsideMask',style:{stroke:false,fillColor:'#000b08',fillOpacity:.76,fillRule:'evenodd'},interactive:false});
+    }
+    outsideDimmed=!outsideDimmed;
+    if(outsideDimmed)outsideMask.addTo(map);else map.removeLayer(outsideMask);
+    document.getElementById('maskButton').setAttribute('aria-pressed',String(outsideDimmed));
+  }catch(_){toast('Nedtoningen kunde inte skapas. Gränskontrollen fortsätter utan skuggning.');}
+}
+// Leaflet must follow actual map dimensions after rotation, text zoom and view changes.
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>map.invalidateSize({pan:false})).observe(document.getElementById('map'));
 
 async function loadBoundary() {
   try {
@@ -457,8 +536,10 @@ async function loadBoundary() {
     if (FaltGeo.classify(data, ...DEFAULT_CENTER).status === 'unknown') throw new Error('Invalid boundary');
     astorpBoundary = data;
     boundaryState = 'ready';
-    const layer = L.geoJSON(data, {style:{color:'#72d8af',weight:3,fillColor:'#4bbb8d',fillOpacity:.08,dashArray:'5,5'},interactive:false}).addTo(map);
-    if (!gpsPos && source === 'gps') map.fitBounds(layer.getBounds(), {padding:[30,30]});
+    boundaryLayer = L.geoJSON(data, {style:{color:'#72d8af',weight:3,fillColor:'#4bbb8d',fillOpacity:.08,dashArray:'5,5'},interactive:false}).addTo(map);
+    document.getElementById('fitBoundaryButton').disabled=false;
+    document.getElementById('maskButton').disabled=false;
+    if (!gpsPos && source === 'gps') fitMunicipality();
   } catch (_) { boundaryState = 'error'; }
   updateDisplay();
 }
@@ -510,13 +591,16 @@ function updateCrosshairCoords() {
     const el=document.getElementById(id); el.textContent=c ? c[i].toFixed(6) : '—';
     el.className='c-digits'+(source==='gps' && gpsAcc>30?' warn':'');
   });
-  const copyField=document.getElementById('copyValue');if(document.activeElement!==copyField)copyField.value=c ? coordsText(c) : '';
+  for(const id of ['copyValue','mapCopyValue']){const copyField=document.getElementById(id);if(document.activeElement!==copyField)copyField.value=c ? coordsText(c) : '';}
   document.getElementById('copyButton').disabled=!c;
   document.getElementById('saveButton').disabled=!c || storageBlocked;
+  document.getElementById('mapCopyButton').disabled=!c;
+  document.getElementById('mapSaveButton').disabled=!c || storageBlocked;
   const age=gpsTimestamp ? Math.max(0,Math.round((Date.now()-gpsTimestamp)/1000)) : null;
   document.getElementById('sourceNote').textContent=source==='gps'
     ? (c ? `Din GPS-position · uppskattad noggrannhet ±${Math.ceil(gpsAcc)} m · ${age} s gammal` : gpsError || (gpsPos ? 'Positionen är äldre än 30 s. Väntar på en ny GPS-mätning.' : gpsOn ? 'Söker GPS. Stå gärna stilla med fri sikt mot himlen.' : 'Tryck ”Hämta min position”. Ingen platsåtkomst sker före ditt val.'))
     : source==='center' ? 'Kartans mittpunkt. Detta är inte din GPS-position.' : 'Vald kartpunkt. Detta är inte din GPS-position.';
+  document.getElementById('mapSourceNote').textContent=document.getElementById('sourceNote').textContent;
   document.getElementById('accTag').style.display=source==='gps' && c ? '' : 'none';
 }
 async function copyCoords() {
@@ -524,7 +608,7 @@ async function copyCoords() {
   if (!coords) return toast('Ingen aktuell position att kopiera.');
   const text=coordsText(coords);
   try { if (!navigator.clipboard || !window.isSecureContext) throw new Error(); await navigator.clipboard.writeText(text); toast('Koordinater kopierade'); }
-  catch (_) { const field=document.getElementById('copyValue');field.value=text;field.focus();field.select();field.setSelectionRange(0,text.length);toast('Markeringen är klar. Välj Kopiera i webbläsaren.'); }
+  catch (_) { const field=document.getElementById(viewMode==='map'?'mapCopyValue':'copyValue');field.value=text;field.focus();field.select();field.setSelectionRange(0,text.length);toast('Markeringen är klar. Välj Kopiera i webbläsaren.'); }
 }
 function updateBoundaryStatus() {
   const badge=document.getElementById('astorpBadge'), detail=document.getElementById('boundaryDetail'), c=getCurrentCoords();
@@ -538,7 +622,11 @@ function updateBoundaryStatus() {
     message=Number.isFinite(result.distanceMeters)?`Cirka ${formatDist(result.distanceMeters)} till kartans kommungräns. `:'';
     message+=state==='uncertain'?'Noggrannheten och kartmarginalen överlappar gränsen. Flytta dig längre från gränsen eller kontrollera med kommunens kartunderlag.':'Bedömning enligt OpenStreetMap. Kartgränsen kan avvika från den juridiska gränsen.';
   }
-  badge.className='astorp-badge '+(state==='outside'?'out':state);badge.textContent=title;detail.textContent=message;
+  badge.className='astorp-badge '+(state==='outside'?'out':state);
+  const symbol={inside:'✓',outside:'×',uncertain:'!',unknown:'?'}[state];
+  badge.innerHTML='<span class="boundary-symbol" aria-hidden="true">'+symbol+'</span><span>'+escapeHTML(title)+'</span>';
+  badge.setAttribute('data-status',state);detail.textContent=message;
+  const mapBadge=document.getElementById('mapStatus');mapBadge.className=badge.className;mapBadge.innerHTML=badge.innerHTML;mapBadge.setAttribute('data-status',state);document.getElementById('mapBoundaryDetail').textContent=message;
 }
 
 function updateContextBadges() {
@@ -598,6 +686,7 @@ function updateDisplay() {
 function isPointInAstorp(lat,lng) { return FaltGeo.classify(astorpBoundary,lat,lng).inside === true; }
 
 map.on('dragstart', () => { if (source === 'gps') setSource('center'); });
+map.on('keydown', e => {if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.originalEvent.key)&&source==='gps')setSource('center');});
 map.on('move', () => { if (source === 'center') updateDisplay(); });
 map.on('moveend', () => { if (source === 'center') updateContextBadges(); });
 
@@ -613,13 +702,14 @@ map.on('click', function(e) {
     radius: 12, color: '#a855f7', fillColor: '#a855f7', fillOpacity: 0.25, weight: 2.5
   }).addTo(map);
   setSource('tap');
-  setTimeout(() => { if (tapMarker) { map.removeLayer(tapMarker); tapMarker = null; } }, 60000);
+  // Keep the selected point visible for as long as its coordinates are available.
 });
 
 function setSource(mode) {
   source=mode;
-  document.querySelectorAll('.source-pill').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode));});
+  document.querySelectorAll('.source-pill').forEach(b=>{b.classList.toggle('active',(b.dataset.mode||b.dataset.source)===mode);b.setAttribute('aria-pressed',String((b.dataset.mode||b.dataset.source)===mode));});
   if (mode==='gps' && !gpsOn) startGPS();
+  document.querySelector('.crosshair').style.display=mode==='center'?'':'none';
   updateDisplay();
 }
 function stopGPS(error='') {
@@ -646,8 +736,8 @@ function startGPS() {
     if(!gpsFresh()){updateDisplay();return;}
     if(waitingForGPSCenter){map.setView(gpsPos,Math.max(map.getZoom(),16));waitingForGPSCenter=false;}
     if(gpsMarker)map.removeLayer(gpsMarker);if(gpsCircle)map.removeLayer(gpsCircle);
-    gpsMarker=L.circleMarker(gpsPos,{radius:7,color:'#fff',fillColor:'#38d9ba',fillOpacity:1,weight:2}).addTo(map);
-    gpsCircle=L.circle(gpsPos,{radius:accuracy,color:'#53e0bd',fillColor:'#53e0bd',fillOpacity:.1,weight:1}).addTo(map);
+    gpsMarker=L.circleMarker(gpsPos,{radius:7,color:'#fff',fillColor:'#3b82f6',fillOpacity:1,weight:2}).addTo(map);
+    gpsCircle=L.circle(gpsPos,{radius:accuracy,color:'#77b3ff',fillColor:'#77b3ff',fillOpacity:.1,weight:1}).addTo(map);
     badge.className='gps-badge tracking';const q=accuracy<10?'good':accuracy<30?'ok':'poor';
     document.getElementById('gpsDot').className='gps-dot '+q;document.getElementById('gpsText').textContent=`GPS ±${Math.ceil(accuracy)} m · stoppa`;
     document.getElementById('accTag').className='acc-tag '+q;document.getElementById('accVal').textContent=Math.ceil(accuracy);
@@ -706,7 +796,7 @@ function openSaveModal() {
 
 function closeSaveModal() {
   document.getElementById('saveModalOverlay').classList.remove('visible');
-  saveSnapshot=null;document.getElementById('saveButton').focus();
+  saveSnapshot=null;document.getElementById(viewMode==='map'?'mapSaveButton':'saveButton').focus();
 }
 
 async function savePoint() {
@@ -756,7 +846,7 @@ function openDrawer() {
   renderList();
 }
 function closeDrawer() {
-  document.getElementById('listDrawer').classList.remove('open');document.getElementById('listDrawer').inert=true;document.querySelector('[onclick="openDrawer()"]').focus();
+  document.getElementById('listDrawer').classList.remove('open');document.getElementById('listDrawer').inert=true;(viewMode==='map'?document.getElementById('mapListButton'):document.querySelector('[onclick="openDrawer()"]')).focus();
 }
 
 function setSort(mode) {

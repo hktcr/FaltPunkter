@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '22'
       - name: Unit and regression tests
-        run: node --test geo.test.cjs app.test.cjs import.test.cjs
+        run: node --test geo.test.cjs app.test.cjs import.test.cjs map-geometry.test.cjs
       - name: Install browser test dependency
         run: npm install --no-save --ignore-scripts playwright@1.62.1
       - name: Install Chromium

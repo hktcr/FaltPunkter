@@ -29,7 +29,7 @@ function app(db={value:null}) {
     control:{scale:layer},DomEvent:{stopPropagation(){}},popup:()=>Object.assign(layer(),{setLatLng(){return this;},setContent(){return this;},openOn(){return this;}}),
     geoJSON(data,options){for(const f of data?.features||[]){const l=layer();l.feature=f;featureLayers.push(l);options?.onEachFeature?.(f,l);}return layer();}};
   const window={isSecureContext:true,addEventListener:(name,cb)=>{windowEvents[name]=cb;}};
-  const context={window,document,L,FaltGeo:require('./geo.js'),FaltImport:require('./import.js'),location:{search:'',hash:''},history:{replaceState(){}},turf:require('./vendor/turf.min.js'),
+  const context={window,document,L,FaltGeo:require('./geo.js'),FaltMap:require('./map-geometry.js'),FaltImport:require('./import.js'),location:{search:'',hash:''},history:{replaceState(){}},turf:require('./vendor/turf.min.js'),
     navigator:{locks:{request:(_name,action)=>Promise.resolve().then(action)},geolocation:{watchPosition(ok,error){watches.push({ok,error});return watches.length;},clearWatch(){}}},
     localStorage:{getItem:key=>key==='faltpunkter_db'?db.value:db[key]??null,setItem:(key,value)=>{if(db.fail||db.failKey===key)throw Error('Quota');if(key==='faltpunkter_db')db.value=value;else db[key]=value;},removeItem:key=>{if(key==='faltpunkter_db')db.value=null;else delete db[key];}},
     fetch:()=>new Promise(()=>{}),setTimeout:()=>0,clearTimeout(){},setInterval:cb=>{intervals.push(cb);return intervals.length;},
@@ -41,7 +41,7 @@ function app(db={value:null}) {
 test('GPS is opt-in; missing position never falls back to map center',()=>{
  const a=app();assert.equal(a.watches.length,0);assert.equal(a.run('getCurrentCoords()'),null);
  assert.equal(a.element('copyButton').disabled,true);assert.equal(a.element('saveButton').disabled,true);
- assert.match(a.element('astorpBadge').textContent,/saknas|gammal/);
+ assert.match(a.element('astorpBadge').innerHTML,/saknas|gammal/);
 });
 test('two tabs cannot overwrite each other’s stored points',()=>{
  const db={value:JSON.stringify([validPoint])},a=app(db),b=app(db);
@@ -93,7 +93,7 @@ test('grid and rook grid clicks tolerate missing GPS coordinates',()=>{
 
 test('aged GPS is neither copyable nor saveable and absent boundary stays unknown',()=>{
  const a=app();a.run('centerOnGPS()');a.fix();
- assert.match(a.element('astorpBadge').textContent,/laddas|saknas/);
+ assert.match(a.element('astorpBadge').innerHTML,/laddas|saknas/);
  a.advance(31000);a.intervals.forEach(f=>f());
  assert.equal(a.run('getCurrentCoords()'),null);
  assert.equal(a.element('copyButton').disabled,true);

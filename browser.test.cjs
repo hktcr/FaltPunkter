@@ -9,7 +9,7 @@ async function start(){server=http.createServer((req,res)=>{
  state.requests.push(req.url);const url=new URL(req.url,'http://localhost');if(!url.pathname.startsWith('/app/')){res.writeHead(404).end();return;}
  const rel=url.pathname.slice(5)||'index.html';if(rel.includes('..')){res.writeHead(400).end();return;}
  let bytes;try{bytes=fs.readFileSync(path.join(root,rel));}catch{res.writeHead(404).end();return;}
- if(rel==='sw.js')bytes=Buffer.from(bytes.toString().replace('faltpunkter-v20261107-2',`faltpunkter-v20261107-${state.release}`));
+ if(rel==='sw.js')bytes=Buffer.from(bytes.toString().replace('faltpunkter-v20261115-1',`faltpunkter-v20261107-${state.release}`));
  if(rel==='index.html')bytes=Buffer.from(bytes.toString().replace('<body>',`<body data-test-release="${state.release}">`));
  const headers={'Content-Type':mime[path.extname(rel)]||'text/plain','Cache-Control':'no-store'};
  if(state.fault==='503'){res.writeHead(503,headers).end('unavailable');return;}
@@ -35,7 +35,7 @@ const f=await fixture(base);const {page,context}=f;
 await run('first install caches a complete app without external requests or automatic GPS',async()=>{
  assert.equal(await page.locator('#copyButton').isDisabled(),true);assert.equal(await page.evaluate(()=>gpsOn),false);
  const resources=await page.evaluate(()=>performance.getEntriesByType('resource').map(e=>e.name));assert.ok(resources.every(u=>u.startsWith(base)));
- assert.equal(await page.evaluate(async()=>{const c=await caches.open('faltpunkter-v20261107-2');return (await c.keys()).length;}),11);
+ assert.equal(await page.evaluate(async()=>{const c=await caches.open('faltpunkter-v20261107-2');return (await c.keys()).length;}),12);
 });
 await run('offline reload with query opens app and known boundary, without forwarding query',async()=>{
  state.requests=[];await context.setOffline(true);await page.goto(base+'?lat=56.123&lng=12.456');await page.locator('[data-mode="center"]').click();await page.waitForFunction(()=>boundaryState==='ready');
@@ -96,5 +96,46 @@ await run('new export is a reversible local download',async()=>{
 });
 assert.deepEqual(q.errors,[]);await q.context.close();
 for(const size of [[320,568],[390,844],[844,390],[1440,900]])await run(`real viewport ${size[0]}x${size[1]} has no horizontal overflow`,async()=>{const f=await fixture(base,...size);assert.equal(await f.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);fs.mkdirSync(path.join(root,'test-results'),{recursive:true});await f.page.screenshot({path:path.join(root,`test-results/${size[0]}x${size[1]}-start.png`)});await f.page.locator('#copyButton').scrollIntoViewIfNeeded();await f.page.screenshot({path:path.join(root,`test-results/${size[0]}x${size[1]}-controls.png`)});await choose(f.page,tsv([point('Mobile preview '+('long '.repeat(40)))]));const bounds=await f.page.locator('#importOverlay .modal').boundingBox();assert.ok(bounds.x>=0&&bounds.x+bounds.width<=size[0]);await f.page.locator('#commitImportButton').scrollIntoViewIfNeeded();assert.equal(await f.page.locator('#commitImportButton').isEnabled(),true);await f.page.screenshot({path:path.join(root,`test-results/${size[0]}x${size[1]}-import.png`)});await f.page.getByRole('button',{name:'Avbryt import'}).click();assert.equal(await db(f.page),null);assert.deepEqual(f.errors,[]);await f.context.close();});
+
+for(const size of [[320,568],[390,844],[844,390],[1440,900]])await run(`map mode ${size[0]}x${size[1]} preserves controls, centering and field mode`,async()=>{
+ const f=await fixture(base,...size);const p=f.page;await p.locator('#mapViewButton').click();
+ assert.equal(await p.locator('#mapViewButton').getAttribute('aria-pressed'),'true');assert.equal(await p.locator('#mapCopyButton').isDisabled(),true);
+ assert.equal(await p.evaluate(()=>gpsOn),false);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await p.locator('[data-source="center"]').click();assert.equal(await p.locator('#mapCopyButton').isEnabled(),true);
+ const mapBox=await p.locator('#map').boundingBox(),cross=await p.locator('.crosshair').boundingBox();assert.ok(mapBox.height>=170);assert.ok(Math.abs(cross.y+cross.height/2-mapBox.y-mapBox.height/2)<2);
+ for(const selector of ['#gpsBadge','.right-controls']){const b=await p.locator(selector).boundingBox();assert.ok(b.x>=mapBox.x&&b.x+b.width<=mapBox.x+mapBox.width+1&&b.y>=mapBox.y&&b.y+b.height<=mapBox.y+mapBox.height+1,selector+' fits map');}
+ await p.locator('#maskButton').click();assert.equal(await p.locator('#maskButton').getAttribute('aria-pressed'),'true');assert.equal(await p.evaluate(()=>map.hasLayer(outsideMask)),true);
+ await p.locator('#fitBoundaryButton').click();assert.equal(await p.evaluate(()=>source),'center');assert.equal(await p.evaluate(()=>map.getBounds().contains(boundaryLayer.getBounds())),true);
+ await p.locator('#map').focus();const before=await p.evaluate(()=>map.getCenter().lng);await p.keyboard.press('ArrowRight');await p.waitForTimeout(300);assert.notEqual(await p.evaluate(()=>map.getCenter().lng),before);
+ await p.locator('#mapViewButton').focus();await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.id),'fitBoundaryButton');
+ fs.mkdirSync(path.join(root,'test-results'),{recursive:true});await p.screenshot({path:path.join(root,`test-results/${size[0]}x${size[1]}-map.png`),fullPage:true});
+ await p.locator('#fieldViewButton').click();assert.equal(await p.locator('#copyButton').isVisible(),true);assert.equal(await p.locator('#saveButton').isVisible(),true);assert.equal(await p.locator('#mapCopyButton').isVisible(),false);assert.equal(await p.evaluate(()=>outsideDimmed),true);assert.equal(await p.evaluate(()=>gpsOn),false);
+ assert.deepEqual(f.errors,[]);await f.context.close();
+});
+await run('map status uses four states and the chosen source, copying and saving share GPS safety',async()=>{
+ const f=await fixture(base),p=f.page;await p.locator('#mapViewButton').click();
+ await p.evaluate(()=>{Object.defineProperty(navigator,'geolocation',{value:{watchPosition(ok,error){window.testFix=ok;window.testGPSError=error;return 1;},clearWatch(){}}});});
+ await p.locator('[data-source="gps"]').click();
+ const fix=async(lat,lng,accuracy=5)=>p.evaluate(({lat,lng,accuracy})=>window.testFix({coords:{latitude:lat,longitude:lng,accuracy},timestamp:Date.now()}),{lat,lng,accuracy});
+ await fix(56.134,12.947);assert.equal(await p.locator('#mapStatus').getAttribute('data-status'),'inside');assert.match(await p.locator('#mapStatus').innerText(),/✓.*Din position/);assert.match(await p.locator('#mapSourceNote').innerText(),/±5 m/);
+ const coordinates=await p.locator('#mapCopyValue').inputValue();await p.evaluate(()=>Object.defineProperty(navigator,'clipboard',{value:{writeText:async()=>{throw Error('Denied clipboard');}},configurable:true}));await p.locator('#mapCopyButton').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'mapCopyValue');
+ await fix(56.135,13.046);assert.equal(await p.locator('#mapCopyValue').inputValue(),coordinates);await p.locator('#mapViewButton').click();await p.waitForTimeout(1100);assert.notEqual(await p.locator('#mapCopyValue').inputValue(),coordinates);
+ await fix(56.0465,12.6945);assert.equal(await p.locator('#mapStatus').getAttribute('data-status'),'outside');assert.match(await p.locator('#mapStatus').innerText(),/×/);
+ const v=await p.evaluate(()=>astorpBoundary.geometry.coordinates[0][0]);await fix(v[1],v[0]);assert.equal(await p.locator('#mapStatus').getAttribute('data-status'),'uncertain');
+ await p.evaluate(()=>{gpsTimestamp=Date.now()-31000;updateDisplay();});assert.equal(await p.locator('#mapStatus').getAttribute('data-status'),'unknown');assert.equal(await p.locator('#mapCopyButton').isDisabled(),true);assert.equal(await p.locator('#mapSaveButton').isDisabled(),true);
+ await p.locator('[data-source="center"]').click();assert.match(await p.locator('#mapSourceNote').innerText(),/inte din GPS-position/);assert.equal(await p.locator('#mapCopyButton').isEnabled(),true);
+ await p.locator('.map-dock summary').click();await p.locator('#mapSaveButton').click();await p.locator('#ptName').fill('Synthetic map point');await p.getByRole('button',{name:'Spara punkt',exact:true}).click();await p.waitForFunction(()=>points.length===1);assert.equal(JSON.parse(await db(p))[0].source,'center');await p.locator('#mapListButton').click();await p.locator('[onclick="closeDrawer()"]').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'mapListButton');
+ await p.locator('[data-source="gps"]').click();await p.evaluate(()=>window.testGPSError({code:1}));assert.match(await p.locator('#mapSourceNote').innerText(),/nekades/);assert.equal(await p.locator('#mapCopyButton').isDisabled(),true);
+ assert.deepEqual(f.errors,[]);await f.context.close();
+});
+await run('background remains opt-in after map mode, and private mode stops further tile requests',async()=>{
+ const f=await fixture(base),p=f.page;const external=[];await f.context.route('https://**/*',route=>{external.push(route.request().url());route.abort();});
+ await p.locator('#mapViewButton').click();await p.locator('#maskButton').click();await p.locator('#backgroundSummary').click();p.once('dialog',d=>d.dismiss());await p.locator('[data-layer="street"]').click();assert.equal(external.length,0);assert.equal(await p.locator('[data-layer="none"]').getAttribute('aria-pressed'),'true');
+ p.once('dialog',d=>d.accept());await p.locator('[data-layer="street"]').click();await p.waitForTimeout(500);assert.ok(external.length>0);await p.locator('#backgroundSummary').click();await p.locator('[data-layer="none"]').click();const count=external.length;await p.evaluate(()=>map.setView([56.2,12.9],12));await p.waitForTimeout(500);assert.equal(external.length,count);assert.match(await p.locator('#mapCaption').innerText(),/Privat gränskarta/);
+ await f.context.setOffline(true);await p.reload();await p.waitForFunction(()=>boundaryState==='ready');await p.locator('#mapViewButton').click();await p.locator('#maskButton').click();assert.equal(await p.evaluate(()=>map.hasLayer(outsideMask)),true);assert.deepEqual(f.errors,[]);await f.context.close();
+});
+await run('missing boundary disables mask and fit without claiming outside',async()=>{
+ const c=await browser.newContext({serviceWorkers:'block'}),p=await c.newPage();await p.route('**/astorp.geojson',r=>r.fulfill({status:503,body:'Unavailable'}));await p.goto(base);await p.waitForFunction(()=>boundaryState==='error');await p.locator('#mapViewButton').click();await p.locator('[data-source="center"]').click();assert.equal(await p.locator('#maskButton').isDisabled(),true);assert.equal(await p.locator('#fitBoundaryButton').isDisabled(),true);assert.equal(await p.locator('#mapStatus').getAttribute('data-status'),'unknown');assert.equal(await p.locator('#mapCopyButton').isEnabled(),true);await c.close();
+});
 console.log(JSON.stringify({passed:results.length,tests:results},null,2));
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();if(server){server.closeAllConnections();server.close();}});

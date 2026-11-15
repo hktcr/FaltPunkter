@@ -36,7 +36,7 @@ Ren statisk webbplats. Ingen byggkedja eller hemlig nyckel behövs.
 
 ```sh
 python -m http.server 8765
-node --test geo.test.cjs app.test.cjs import.test.cjs
+node --test geo.test.cjs app.test.cjs import.test.cjs map-geometry.test.cjs
 ```
 
 `ui.test.cjs` är en kompatibilitetsingång till `browser.test.cjs`, en Playwright-svit med syntetiska positioner och skärmstorlekar. Den kräver Playwright och Chromium och startar sin egen lokala HTTP-server. Testerna ändrar bara isolerade testkontexter, aldrig användarens riktiga lagring. Testkörningens status dokumenteras i `TESTING.md`.
@@ -62,3 +62,15 @@ Nya TSV-exporter är versionsmärkta och bevarar citationstecken, radbrytningar,
 ### Riktiga webbläsartester
 
 `node browser.test.cjs` startar sin egen lokala HTTP-server och Chromium med riktig Cache API, service worker och Web Locks. GitHub Actions kör den samt 38 enhetstester på varje push. Servern simulerar offline, HTTP 503, långa svarstider och avstannade svarskroppar. Alla positioner är syntetiska. Testerna berör ingen användares riktiga data.
+
+## Kartvy, version 2026-11-15.1
+
+Välj **Kartvy** överst för större karta, gränsstatus, tydlig koordinatkälla och direkt kopiering. **Fältvy** behåller de stora koordinatsiffrorna, import/export, inventeringslager och hjälp. Båda vyerna använder samma GPS-mätning och samma spärr mot gammal position. Kartvyns meny **Precision, spara & fler verktyg** innehåller gränsavstånd och sparade punkter.
+
+- **Visa Åstorp** passar hela kommungränsen i kartan. Det byter inte koordinatkälla.
+- **Tona ned utanför** är ett valfritt lokalt lager som även skuggar hål i kommunpolygonen. Det hämtar inga kartbilder och ändrar inte gränsklassningen.
+- Grönt ✓ = innanför, rött × = utanför, gult ! = osäkert nära gränsen och grått ? = underlag saknas. Texten anger om beskedet gäller GPS eller en vald kartpunkt.
+- **Bakgrund: privat** visar endast den lokala gränskartan. Välj en bakgrund för gatunamn eller terräng; samma befintliga kartleverantörer och samtyckesdialog används. Kartläget slår aldrig automatiskt på GPS eller externa kartor.
+- Målpunkten följer kartans mitt bara när Kartmitt är vald. En vald kartpunkt ligger kvar så länge dess koordinater finns kvar. Blå GPS-markör och noggrannhetscirkel skiljer sig från den lila valda punkten.
+
+`map-geometry.js` använder projektets befintliga Turf för union och invers polygon. `map-geometry.test.cjs` testar verkliga kommunhål, öar, överlapp och felaktigt underlag. Inget gränsunderlag eller inventeringsdata har ändrats.

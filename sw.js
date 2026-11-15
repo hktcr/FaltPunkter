@@ -2,9 +2,9 @@
  * Queries/fragments are never used as cache keys or forwarded by this worker.
  * The browser's very first visit reaches the host before a worker can control it;
  * the application never creates URLs containing coordinates. */
-const VERSION='faltpunkter-v20261107-2';
+const VERSION='faltpunkter-v20261115-1';
 const NETWORK_TIMEOUT_MS=5000;
-const ASSETS=['index.html','geo.js','import.js','astorp.geojson','vendor/leaflet.js','vendor/leaflet.css','vendor/turf.min.js','icon.svg','manifest.webmanifest','data/astorp-grid-250m.geojson','data/rakobservations.json'];
+const ASSETS=['index.html','geo.js','map-geometry.js','import.js','astorp.geojson','vendor/leaflet.js','vendor/leaflet.css','vendor/turf.min.js','icon.svg','manifest.webmanifest','data/astorp-grid-250m.geojson','data/rakobservations.json'];
 const SCOPE=new URL(self.registration.scope);
 const URLS=new Set(ASSETS.map(path=>new URL(path,SCOPE).href));
 function canonicalURL(input){
